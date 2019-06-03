@@ -1,0 +1,15 @@
+.cameraBox{
+  position: relative;
+}
+
+
+
+#inputVideo{
+  position: absolute;
+}
+
+
+
+#overlay{
+  position: absolute;
+}
