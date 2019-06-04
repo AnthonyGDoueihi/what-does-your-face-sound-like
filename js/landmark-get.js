@@ -1,14 +1,12 @@
-document.addEventListener("DOMContentLoaded", function(event) {
-  run();
-})
-
 const useTinyModel = true;
 let options;
 let canvas;
 let displaySize;
 let input;
+let camLoad = false;
+let modelsLoad = false;
 
-async function run(){
+async function faceTrackStart(){
   const MODEL_URL = './models';
   // load the models
   await faceapi.loadTinyFaceDetectorModel(MODEL_URL);
@@ -25,31 +23,35 @@ async function run(){
   )
 
 
-  options = new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.5 })
+  options = new faceapi.TinyFaceDetectorOptions({
+    inputSize: 128,
+    scoreThreshold: 0.5
+  })
 
-
+  modelsLoad = true;
 }
 
-const onFirstPlay = async function(){
+const onCamLoad = function(){
   canvas = document.getElementById('overlay');
   displaySize = { width: input.videoWidth, height: input.videoHeight };
   faceapi.matchDimensions(canvas, displaySize);
-  onPlay();
+  camLoad = true;
 }
 
-const onPlay = async function () {
+const getLandmarks = async function () {
 
   const faceDetection = await faceapi.detectSingleFace(input, options).withFaceLandmarks(useTinyModel);
 
   if(faceDetection){
     const resizedResults = faceapi.resizeResults(faceDetection, displaySize);
-    console.log(resizedResults.landmarks.positions[0]);
-
-    // faceapi.draw.drawDetections(canvas, resizedResults);
-    // faceapi.draw.drawFaceLandmarks(canvas, resizedResults);
+    faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
+    return resizedResults.landmarks.positions.map((point) => {
+      return {
+        x: point.x/displaySize.width,
+        y: point.y/displaySize.height
+      }
+    });
   }
 
-  setTimeout(() => onPlay())
-
-
+  return null;
 }

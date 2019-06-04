@@ -7,11 +7,12 @@
     <script src="js/tone.js" charset="utf-8"></script>
     <script src="js/face-api.min.js" charset="utf-8"></script>
     <script src="js/landmark-get.js" charset="utf-8"></script>
+    <script src="js/music-make.js" charset="utf-8"></script>
   </head>
   <body>
     <h1>What Does Your Face Sound Like?</h1>
     <div class="cameraBox">
-      <video onplay="onFirstPlay()" id="inputVideo" autoplay muted></video>
+      <video onplay="onCamLoad()" id="inputVideo" autoplay muted></video>
       <canvas id="overlay" />
     </div>
   </body>
