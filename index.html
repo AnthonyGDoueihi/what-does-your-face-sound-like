@@ -2,9 +2,14 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>Face Sounds</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/tone.js" charset="utf-8"></script>
+    <script src="js/face-api.min.js" charset="utf-8"></script>
+    <script src="js/landmark-get.js" charset="utf-8"></script>
   </head>
   <body>
+    <h1>What Does Your Face Sound Like?</h1>
     <div class="cameraBox">
       <video onplay="onFirstPlay()" id="inputVideo" autoplay muted></video>
       <canvas id="overlay" />
