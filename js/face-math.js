@@ -61,6 +61,13 @@ const getFacePiece = {
 
 }
 
+const hypot = function(p1, p2){
+    const a = p1.x -  p2.x;
+    const b = p1.y -  p2.y;
+    return Math.sqrt( a * a + b * b );
+
+}
+
 // Object to do the calculations needed
 const getValues = {
   averagePoints(points){
@@ -71,15 +78,45 @@ const getValues = {
       }
     }, {
       x: 0,
-      y:0
+      y: 0
     })
   },
 
+  // Check if the edges of the mouth are higher than the average distance of the mouth points to see if it is a smile
   isSmile(){
     const mouth = getFacePiece.getMouth();
     const mouthAverage = this.averagePoints(mouth);
-    console.log(mouthAverage.y);
-    console.log(mouth.map((pnt) => pnt.y));
+
+    const leftDistance = hypot(mouth[0], mouthAverage) + hypot(mouth[12], mouthAverage);
+
+    const rightDistance =  hypot(mouth[6], mouthAverage) +  + hypot(mouth[16], mouthAverage);
+
+    console.log(leftDistance, 'left');
+    console.log(rightDistance, 'right');
+
+    const averageDistance = (leftDistance + rightDistance) / 4;
+
+    // Make sure the head isn't tilted at this point or the data is invalid
+    if( averageDistance > 0.12 && Math.abs(leftDistance - rightDistance) < 0.05 ){
+      return true;
+    }else{
+      return false;
+    }
+  },
+
+  // Use the eyebrows to see if the head is turned by getting the average height of both
+  headTilt(){
+    const leftAverage = this.averagePoints(getFacePiece.getLeftEyeBrow());
+    const rightAverage = this.averagePoints(getFacePiece.getRightEyeBrow());
+
+    console.log(leftAverage.y, 'left');
+    console.log(rightAverage.y, 'right');
+
+    if( Math.abs(leftAverage.y - rightAverage.y) < 0.05 ){
+      return false;
+    }
+
+    return leftAverage.y < rightAverage.y ? 'right' : 'left';
 
   }
 }

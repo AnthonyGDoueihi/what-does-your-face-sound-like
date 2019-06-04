@@ -54,15 +54,18 @@ const getLandmarks = async function () {
     firstFaceFound = true;
     // resize according to the webcam
     const resizedResults = faceapi.resizeResults(faceDetection, displaySize);
-    // faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
-    
+
+    faceapi.getContext2dOrThrow(canvas).clearRect(0,0, displaySize.width, displaySize.height);
+    faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
+    return resizedResults.landmarks.relativePositions
+
     // pass through only the relatice x and y position of each point
-    return resizedResults.landmarks.positions.map((point) => {
-      return {
-        x: point.x/displaySize.width,
-        y: point.y/displaySize.height
-      }
-    });
+    // return resizedResults.landmarks.positions.map((point) => {
+      // return {
+        // x: point.x/displaySize.width,
+        // y: point.y/displaySize.height
+      // }
+    // });
   }
   // If no face was found return a null
   return null;
