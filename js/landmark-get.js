@@ -2,19 +2,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
   run();
 })
 
-let mtcnnForwardParams;
+const useTinyModel = true;
+let options;
 let canvas;
 let displaySize;
 let input;
 
 async function run(){
-
   const MODEL_URL = './models';
   // load the models
-  // await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
-  // await faceapi.loadMtcnnModel(MODEL_URL);
-  await faceapi.loadFaceLandmarkModel(MODEL_URL);
-  await faceapi.loadFaceRecognitionModel(MODEL_URL);
+  await faceapi.loadTinyFaceDetectorModel(MODEL_URL);
+  await faceapi.loadFaceLandmarkTinyModel(MODEL_URL);
 
   // try to access users webcam and stream the images
   // to the video element
@@ -27,21 +25,8 @@ async function run(){
   )
 
 
-  mtcnnForwardParams = {
-    // number of scaled versions of the input image passed through the CNN
-    // of the first stage, lower numbers will result in lower inference time,
-    // but will also be less accurate
-    maxNumScales: 10,
-    // scale factor used to calculate the scale steps of the image
-    // pyramid used in stage 1
-    scaleFactor: 0.709,
-    // the score threshold values used to filter the bounding
-    // boxes of stage 1, 2 and 3
-    scoreThresholds: [0.6, 0.7, 0.7],
-    // mininum face size to expect, the higher the faster processing will be,
-    // but smaller faces won't be detected
-    minFaceSize: 200
-  }
+  options = new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.5 })
+
 
 }
 
@@ -54,7 +39,7 @@ const onFirstPlay = async function(){
 
 const onPlay = async function () {
 
-  const faceDetection = await faceapi.detectSingleFace(input).withFaceLandmarks();
+  const faceDetection = await faceapi.detectSingleFace(input, options).withFaceLandmarks(useTinyModel);
 
   if(faceDetection){
     const resizedResults = faceapi.resizeResults(faceDetection, displaySize);
@@ -62,9 +47,9 @@ const onPlay = async function () {
 
     // faceapi.draw.drawDetections(canvas, resizedResults);
     // faceapi.draw.drawFaceLandmarks(canvas, resizedResults);
-  }else{
-    setTimeout(() => onPlay())
-
   }
+
+  setTimeout(() => onPlay())
+
 
 }
