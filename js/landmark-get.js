@@ -48,12 +48,13 @@ const getLandmarks = async function () {
   // asynch function to get a single face and get its landmarks
   const faceDetection = await faceapi.detectSingleFace(input, options).withFaceLandmarks(useTinyModel);
 
+  faceapi.getContext2dOrThrow(canvas).clearRect(0,0, displaySize.width, displaySize.height);
+
   // If a face was found
   if(faceDetection){
     // resize according to the webcam
     const resizedResults = faceapi.resizeResults(faceDetection, displaySize);
 
-    faceapi.getContext2dOrThrow(canvas).clearRect(0,0, displaySize.width, displaySize.height);
     faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
     return resizedResults.landmarks.relativePositions
   }

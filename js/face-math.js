@@ -103,9 +103,6 @@ const getValues = {
     const leftAverage = this.averagePoints(getFacePiece.getLeftEyeBrow());
     const rightAverage = this.averagePoints(getFacePiece.getRightEyeBrow());
 
-    console.log(leftAverage.y, 'left');
-    console.log(rightAverage.y, 'right');
-
     if( Math.abs(leftAverage.y - rightAverage.y) < 0.05 ){
       return false;
     }
