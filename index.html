@@ -11,14 +11,17 @@
     <script src="js/note-chord.js" charset="utf-8"></script>
     <script src="js/landmark-get.js" charset="utf-8"></script>
     <script src="js/face-math.js" charset="utf-8"></script>
-    
+
     <script src="js/music-make.js" charset="utf-8"></script>
   </head>
   <body>
     <h1>What Does Your Face Sound Like?</h1>
-    <div class="cameraBox">
-      <video onplay="onCamLoad()" id="inputVideo" autoplay muted></video>
-      <canvas id="overlay" />
+    <button type="button" id="playButton"><p role="image" aria-label="hamburger">🎤</p></button>
+    <div>
+      <div class="cameraBox">
+        <video onplay="onCamLoad()" id="inputVideo" autoplay muted></video>
+        <canvas id="overlay" />
+      </div>
     </div>
   </body>
 </html>

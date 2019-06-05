@@ -1,6 +1,5 @@
 let warmedUp = false;
 let facePoints = [];
-let audioSetup = false;
 
 const detection = async function(){
   // keep on loop
@@ -14,17 +13,12 @@ const detection = async function(){
     return;
   }
 
-  if(firstFaceFound){
-    if (!audioSetup){
-      setupAudio();
-      audioSetup = true;
-    }
-  }
-
   // Get results calculated earlier and pass them into the global variable
   const results = await getLandmarks();
   if ( results ){
     facePoints = results;
+  }else{
+    //TODO face can't be found let them know. Maybe put a time delay
   }
 }
 

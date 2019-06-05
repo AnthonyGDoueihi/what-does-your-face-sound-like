@@ -5,7 +5,6 @@ let displaySize;
 let input;
 let camLoad = false;
 let modelsLoad = false;
-let firstFaceFound = false;
 
 async function faceTrackStart(){
 
@@ -38,8 +37,8 @@ async function faceTrackStart(){
 const onCamLoad = function(){
   canvas = document.getElementById('overlay');
   displaySize = { width: input.videoWidth, height: input.videoHeight };
-  faceapi.matchDimensions(canvas, displaySize);
 
+  faceapi.matchDimensions(canvas, displaySize);
   //Once loaded set true so other functions can start
   camLoad = true;
 }
@@ -51,21 +50,12 @@ const getLandmarks = async function () {
 
   // If a face was found
   if(faceDetection){
-    firstFaceFound = true;
     // resize according to the webcam
     const resizedResults = faceapi.resizeResults(faceDetection, displaySize);
 
     faceapi.getContext2dOrThrow(canvas).clearRect(0,0, displaySize.width, displaySize.height);
     faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
     return resizedResults.landmarks.relativePositions
-
-    // pass through only the relatice x and y position of each point
-    // return resizedResults.landmarks.positions.map((point) => {
-      // return {
-        // x: point.x/displaySize.width,
-        // y: point.y/displaySize.height
-      // }
-    // });
   }
   // If no face was found return a null
   return null;
