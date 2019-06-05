@@ -1,28 +1,3 @@
-let warmedUp = false;
-let facePoints = [];
-
-const detection = async function(){
-  // keep on loop
-  setTimeout(detection, 0);
-
-  // if the models and camera are not ready, return before the detections
-  if(!warmedUp){
-    if(modelsLoad === true && camLoad === true){
-      warmedUp = true;
-    }
-    return;
-  }
-
-  // Get results calculated earlier and pass them into the global variable
-  const results = await getLandmarks();
-  if ( results ){
-    facePoints = results;
-  }else{
-    //TODO face can't be found let them know. Maybe put a time delay
-  }
-}
-
-
 // Object made to segment the face into pieces for easier use
 const getFacePiece = {
   getJawOutline() {
