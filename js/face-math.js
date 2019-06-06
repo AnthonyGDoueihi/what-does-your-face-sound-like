@@ -60,9 +60,6 @@ const getValues = {
 
     const rightDistance =  hypot(mouth[6], mouthAverage) +  + hypot(mouth[16], mouthAverage);
 
-    console.log(leftDistance, 'left');
-    console.log(rightDistance, 'right');
-
     const averageDistance = (leftDistance + rightDistance) / 4;
 
     // Make sure the head isn't tilted at this point or the data is invalid
@@ -87,6 +84,6 @@ const getValues = {
   },
 
   nosePointer(){
-    
+
   }
 }

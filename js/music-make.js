@@ -29,7 +29,8 @@ let key;
 let noteArray;
 
 let sequence;
-let halfSequence;
+
+
 
 const setupAudio = function(){
   // Setup drum samples
@@ -45,6 +46,12 @@ const setupAudio = function(){
   const chord = new Tone.PolySynth(3, Tone.Synth).toMaster();
 
   sequence = new Tone.Sequence( (time, col) => {
+
+    console.log(timelineCount, col)
+
+    if( col === 0){
+      timelineCount += 1;
+    }
 
     if ( music.drum.kick[col] === 1 ){
       kick.start(time);
@@ -87,148 +94,50 @@ const setupAudio = function(){
       }
     }
 
-    Tone.Draw.schedule( () => {
+    if( [1, 2, 3, 4, 6, 8, 10].includes(timelineCount) ){
+      if( col === (steps.length/2) - 1){
 
-    }, time);
+        if ( timelineCount === 2 ){
+          musicScale = getValues.isSmile() ? 'major-pentatonic' : "minor-pentatonic";
+        }
 
-    if( col === steps.length - 1){
-      timelineCount += 1;
-      sequence.stop();
-      setTimeout(()=>{
-        sequenceCheck();
-      }, 0)
+        if ( timelineCount === 3 ){
+          // key = getValues
+          // key = key + '4';
+        }
+
+        sequence.stop();
+        sequence.start('+16n');
+      }
+
     }
+
 
   }, steps, '16n');
-
-  halfSequence = new Tone.Sequence( (time, col) => {
-    if ( music.drum.kick[col] === 1 ){
-      kick.start(time);
-    }
-
-    if ( music.drum.clap[col] === 1 ){
-      clap.start(time);
-    }
-
-    if( col === (steps.length/2) - 1){
-      if ( timelineCount === 2 ){
-        musicScale = getValues.isSmile() ? 'major-pentatonic' : "minor-pentatonic";
-      }
-
-      if ( timelineCount === 3 ){
-        // key = getValues
-        // key = key + '4';
-      }
-
-      timelineCount += 1;
-      halfSequence.stop();
-      setTimeout(()=>{
-        sequenceCheck();
-      }, 0)
-    }
-
-  }, steps.slice(0, steps.length/2), '16n');
-
 }
 
 const playButton = function(){
-  timelineCount += 1;
-  sequenceCheck();
+  sequence.start();
+  Tone.Transport.toggle();
 }
 
-const sequenceCheck = function(){
-  console.log(timelineCount);
-  switch (timelineCount) {
-    case 0:
-    //Before the original play
-      break;
-
-    case 1:
-      //How to play
-      halfSequence.start();
-      Tone.Transport.toggle();
-      break;
-
-    case 2:
-      // Which Scale?
-      halfSequence.start();
-      break;
-
-    case 3:
-      // Which Key
-      halfSequence.start();
-      break;
-
-    case 4:
-      //How to do the hats
-      // noteArray = Tonal.scale(musicScale).map(transpose(key));
-      halfSequence.start();
-      break;
-
-    case 5:
-      //Record the hats
-      playDrum = true;
-      sequence.start();
-      break;
-
-    case 6:
-      //Well done & How to do the chords
-      playDrum = false;
-      halfSequence.start();
-      break;
-
-    case 7:
-      //Record the chords
-      playChords = true;
-      sequence.start();
-      break;
-
-    case 8:
-      // Well done & How to do the melody
-      playChords = false;
-      halfSequence.start();
-      break;
-
-    case 9:
-      // Record the Melody
-      playMelody = true;
-      sequence.start();
-      break;
-
-    case 10:
-      // Congradulations!!!!
-      playMelody = false;
-      halfSequence.start();
-      break;
-
-    case 11:
-      isRecording = true;
-      playDrum = true;
-      playMelody = true;
-      playChords = true;
-      sequence.start();
-      break;
-
-    case 12:
-      isRecording = false;
-      playDrum = false;
-      playMelody = false;
-      playChords = false;
-      Tone.Transport.toggle();
-      break;
-
-    default:
-      console.log("How did you even do this?");
-      return;
-
-  }
-}
-
+// 0: Before the original play
+//1: How to play
+//2: Which Scale?
+//3: Which Key?
+//4: How to do the hats
+//5: Record the hats - full
+//6: Well Done
+// 6.5: How to do the chords
+//7: Record the Chords - full
+//8: Well Done
+// 8.5: How to do the melody
+//9: Record the Melody - full
+//10: You done did it!
+//11: Full playback and record
+//12: The end, stop playing
 
 //For testing remove later
 document.addEventListener('keypress', (e) => {
 
-  playButton();
-  // differences.push(getFacePiece.getJawOutline());
-  // console.log(differences);
 })
