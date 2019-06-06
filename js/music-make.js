@@ -15,13 +15,21 @@ const music = {
 
 }
 
-let isRecord = true;
-let playDrum = true;
+let timelineCount = 0;
+
+let playDrum = false;
 let playChords = false;
 let playMelody = false;
+let isRecording = false;
+
+let isGetScale = false;
+let musicScale;
+let isGetKey = false;
+let key;
+let noteArray;
 
 let sequence;
-let ready;
+let halfSequence;
 
 const setupAudio = function(){
   // Setup drum samples
@@ -37,7 +45,7 @@ const setupAudio = function(){
   const chord = new Tone.PolySynth(3, Tone.Synth).toMaster();
 
   sequence = new Tone.Sequence( (time, col) => {
-    console.log(time);
+
     if ( music.drum.kick[col] === 1 ){
       kick.start(time);
     }
@@ -48,9 +56,9 @@ const setupAudio = function(){
 
     if( playDrum ){
 
-      const headTilt = getValues.headTilt();
-      if ( isRecord ){
-        console.log(headTilt);
+      if ( timelineCount === 5 ){
+        const headTilt = getValues.headTilt();
+
         if( headTilt === 'left' ){
           music.drum.openHat[col] = 1;
         }else if ( headTilt === 'right' ){
@@ -68,29 +76,153 @@ const setupAudio = function(){
     }
 
     if( playChords ){
+      if ( timelineCount === 7 ){
 
+      }
     }
 
     if( playMelody ){
+      if ( timelineCount === 9 ){
 
+      }
     }
 
     Tone.Draw.schedule( () => {
 
     }, time);
 
+    if( col === steps.length - 1){
+      timelineCount += 1;
+      sequence.stop();
+      setTimeout(()=>{
+        sequenceCheck();
+      }, 0)
+    }
+
   }, steps, '16n');
 
-}
+  halfSequence = new Tone.Sequence( (time, col) => {
+    if ( music.drum.kick[col] === 1 ){
+      kick.start(time);
+    }
 
+    if ( music.drum.clap[col] === 1 ){
+      clap.start(time);
+    }
+
+    if( col === (steps.length/2) - 1){
+      if ( timelineCount === 2 ){
+        musicScale = getValues.isSmile() ? 'major-pentatonic' : "minor-pentatonic";
+      }
+
+      if ( timelineCount === 3 ){
+        // key = getValues
+        // key = key + '4';
+      }
+
+      timelineCount += 1;
+      halfSequence.stop();
+      setTimeout(()=>{
+        sequenceCheck();
+      }, 0)
+    }
+
+  }, steps.slice(0, steps.length/2), '16n');
+
+}
 
 const playButton = function(){
-  sequence.start();
-  Tone.Transport.toggle();
+  timelineCount += 1;
+  sequenceCheck();
 }
 
+const sequenceCheck = function(){
+  console.log(timelineCount);
+  switch (timelineCount) {
+    case 0:
+    //Before the original play
+      break;
 
-// const scale = getValues.isSmile() ? 'major' : 'minor';
+    case 1:
+      //How to play
+      halfSequence.start();
+      Tone.Transport.toggle();
+      break;
+
+    case 2:
+      // Which Scale?
+      halfSequence.start();
+      break;
+
+    case 3:
+      // Which Key
+      halfSequence.start();
+      break;
+
+    case 4:
+      //How to do the hats
+      // noteArray = Tonal.scale(musicScale).map(transpose(key));
+      halfSequence.start();
+      break;
+
+    case 5:
+      //Record the hats
+      playDrum = true;
+      sequence.start();
+      break;
+
+    case 6:
+      //Well done & How to do the chords
+      playDrum = false;
+      halfSequence.start();
+      break;
+
+    case 7:
+      //Record the chords
+      playChords = true;
+      sequence.start();
+      break;
+
+    case 8:
+      // Well done & How to do the melody
+      playChords = false;
+      halfSequence.start();
+      break;
+
+    case 9:
+      // Record the Melody
+      playMelody = true;
+      sequence.start();
+      break;
+
+    case 10:
+      // Congradulations!!!!
+      playMelody = false;
+      halfSequence.start();
+      break;
+
+    case 11:
+      isRecording = true;
+      playDrum = true;
+      playMelody = true;
+      playChords = true;
+      sequence.start();
+      break;
+
+    case 12:
+      isRecording = false;
+      playDrum = false;
+      playMelody = false;
+      playChords = false;
+      Tone.Transport.toggle();
+      break;
+
+    default:
+      console.log("How did you even do this?");
+      return;
+
+  }
+}
 
 
 //For testing remove later
@@ -100,19 +232,3 @@ document.addEventListener('keypress', (e) => {
   // differences.push(getFacePiece.getJawOutline());
   // console.log(differences);
 })
-
-
-// Octives will be hard coded
-
-// After play,
-// Intro how to appears
-// Choose Scale, Major or Minor, smile!
-// Choose Key, use nose to point at correct area
-// ClosedHat right, OpenHat left
-// Record the Closed and Open hats
-// Well done!
-// Chords on head nod
-// Record the chords
-// Well done!
-// Melody is position of eyes up, down, left, right
-// Record melody

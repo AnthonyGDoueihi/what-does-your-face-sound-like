@@ -84,5 +84,9 @@ const getValues = {
 
     return leftAverage.y < rightAverage.y ? 'right' : 'left';
 
+  },
+
+  nosePointer(){
+    
   }
 }
