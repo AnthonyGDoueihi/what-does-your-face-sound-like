@@ -1,5 +1,8 @@
 const useTinyModel = true;
 let warmedUp = false;
+let displaySize;
+let facePoints;
+
 
 const options = new faceapi.TinyFaceDetectorOptions({
     inputSize: 128,
@@ -20,8 +23,9 @@ const detection = async function(){
   const results = await getLandmarks();
   if ( results ){
     facePoints = results;
+    canSeeFace = true;
   }else{
-    //TODO face can't be found let them know. Maybe put a time delay
+    canSeeFace = false;
   }
 }
 
@@ -34,8 +38,8 @@ const getLandmarks = async function () {
   if(faceDetection){
 
     // resize according to the canvas
-    resizedResults = faceapi.resizeResults(faceDetection, displaySize);
-    return resizedResults.landmarks.relativePositions
+    const resizedResults = faceapi.resizeResults(faceDetection, displaySize);
+    return resizedResults.landmarks;
   }
 
   // If no face was found return a null

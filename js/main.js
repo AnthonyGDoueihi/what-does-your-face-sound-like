@@ -1,11 +1,11 @@
 let input;
-let displaySize;
 let canvas;
 let capture;
-let resizedResults;
-let facePoints = [];
+let canSeeFace = false;
 
 async function setup(){
+  angleMode(DEGREES);
+
   canvas = createCanvas(windowWidth, windowHeight).elt;
 
   // load the models
@@ -25,12 +25,18 @@ let sideWidth;
 let height8;
 let sideWidth5;
 
+let shiftDown;
+let camHeight;
+
+let nosePointKey = { x:0, y:0 };
+
 function draw(){
   sideWidth = width / 5;
   height8 = height / 8;
   sideWidth5 = sideWidth / 5;
+  textAlign(LEFT, TOP)
 
-  if(capture && canvas && resizedResults){
+  if(capture && canvas){
     // Background colour for above and below camera
     noStroke();
     fill(124, 88, 105);
@@ -39,13 +45,21 @@ function draw(){
     // Flip the camera dimensions and print camera to screen
     scale(-1, 1);
     translate(-width ,0);
-    const camHeight = width * capture.height / capture.width
-    const topAndBot = (height - camHeight) / 2;
-    image(capture, 0, topAndBot, width, camHeight);
+    camHeight = width * capture.height / capture.width
+    shiftDown = (height - camHeight) / 2;
+    image(capture, 0, shiftDown, width, camHeight);
+
+    if (canSeeFace){
+
+    }else{
+
+    }
+
 
     // Reflip the camera
     scale(-1, 1);
     translate(-width, 0);
+
 
     // Side bars same colour as background to put webcam in a box
     fill(124, 88, 105);
@@ -56,14 +70,15 @@ function draw(){
     noFill();
     stroke(0);
     strokeWeight(4);
-    rect(sideWidth, topAndBot, width - 2 * sideWidth, camHeight);
+    rect(sideWidth, shiftDown, width - 2 * sideWidth, camHeight);
 
 
     noStroke();
     fill(200);
     textSize(20);
 
-    // All potential things to change and animate over the lifecycle
+    drawSmile();
+    // All potential things to change and animate over the timeline
     switch (timelineCount) {
       case 0:
       //Before the original play
@@ -100,6 +115,12 @@ function draw(){
         text("Which Scale?", 50, 50);
         text("Smile for Major", 50, 200);
         text("Frown for Minor", 50, 350);
+        drawSmile();
+        if( getValues.isSmile() ){
+          text("Smile", width - 100, 200);
+        }else{
+          text("Frown", width - 100, 200);
+        }
         break;
 
       case 3:
@@ -107,6 +128,9 @@ function draw(){
         text('3', width - 50, 50);
         text("Which Key?", 50, 50);
         text("Point with your nose", 50, 200);
+
+        keySelection();
+
         break;
 
       case 4:
@@ -170,9 +194,151 @@ function draw(){
         return;
 
       }
-
-
   }
+}
+
+function drawSmile(){
+  if(facePoints){
+    const mouth = getFacePiece.getMouth();
+    noFill();
+    if( getValues.isSmile() ){
+      stroke(0, 0, 255);
+    }else{
+      stroke(255, 0, 0);
+    }
+
+    beginShape();
+
+    let convertedPoint = inversePoints(mouth[mouth.length - 1]);
+    curveVertex(convertedPoint.x, convertedPoint.y);
+
+    for ( let i = 0; i < mouth.length; i ++){
+      const convertedPoint = inversePoints(mouth[i]);
+      curveVertex(convertedPoint.x, convertedPoint.y);
+    }
+
+    convertedPoint = inversePoints(mouth[0]);
+    curveVertex(convertedPoint.x, convertedPoint.y);
+    convertedPoint = inversePoints(mouth[1]);
+    curveVertex(convertedPoint.x, convertedPoint.y);
+
+    endShape();
+  }
+  noStroke();
+}
+
+function angleBetweenVectors(x1, y1, x2, y2){
+  const dot = x1 * x2 + y1 * y2;
+  // console.log('d', dot);
+  const lengths = hypot({ x:0, y:0 },{ x:x1, y:y1 } ) * hypot({ x:0, y:0 },{ x:x2, y:y2 } );
+  // console.log('l', lengths);
+
+  return acos(dot/lengths);
+}
+
+function keySelection(){
+
+  // To Point with the Nose
+  if(facePoints){
+    nosePointKey = inversePoints(getValues.nosePointer());
+  }
+
+  stroke(255, 255, 255);
+
+  colorMode(HSB, 360);
+  const diameter = height - (2 * shiftDown) - 5;
+  const centreWidth = width/2;
+  const centreHeight = height/2
+  let angleOfNose = angleBetweenVectors( centreWidth + camHeight / 3 - width/2, centreHeight - height/2, nosePointKey.x - width/2, nosePointKey.y - height/2);
+  angleOfNose = nosePointKey.y < centreHeight ? 360 - angleOfNose : angleOfNose;
+
+  if( (angleOfNose < 22.5 && angleOfNose > 0) || (angleOfNose < 360 && angleOfNose > 337.5 )){
+    fill(0, 300, 300, 300);
+    key = "D";
+  }else{
+    fill(0, 300, 300, 150);
+  }
+  arc(width/2, height/2, diameter, diameter, -22.5, 22.5,  PIE);
+
+  if( angleOfNose < 67.5 && angleOfNose > 22.5){
+    fill(45, 300, 300, 300);
+    key = "E";
+  }else{
+    fill(45, 300, 300, 150);
+  }
+  arc(width/2, height/2, diameter, diameter, 22.5, 67.5,  PIE);
+
+
+  if( angleOfNose < 112.5 && angleOfNose > 67.5){
+    fill(90, 300, 300, 300);
+    key = "F";
+  }else{
+    fill(90, 300, 300, 150);
+  }
+  arc(width/2, height/2, diameter, diameter, 67.5, 112.5,  PIE);
+
+  if( angleOfNose < 157.5 && angleOfNose > 112.5){
+    fill(135, 300, 300, 300);
+    key = "G";
+  }else{
+    fill(135, 300, 300, 150);
+  }
+  arc(width/2, height/2, diameter, diameter, 112.5, 157.5,  PIE);
+
+  if( angleOfNose < 202.5 && angleOfNose > 157.5){
+    fill(180, 300, 300, 300);
+    key = null;
+  }else{
+    fill(180, 300, 300, 150);
+  }
+  arc(width/2, height/2, diameter, diameter, 157.5, 202.5,  PIE);
+
+
+  if( angleOfNose < 247.5 && angleOfNose > 202.5){
+    fill(225, 300, 300, 300);
+    key = "A";
+  }else{
+    fill(225, 300, 300, 150);
+  }
+  arc(width/2, height/2, diameter, diameter, 202.5, 247.5,  PIE);
+
+  if( angleOfNose < 292.5 && angleOfNose > 247.5){
+    fill(270, 300, 300, 300);
+    key = "B";
+  }else{
+    fill(270, 300, 300, 150);
+  }
+  arc(width/2, height/2, diameter, diameter, 247.5, 292.5,  PIE);
+
+  if( angleOfNose < 337.5 && angleOfNose > 292.5){
+    fill(315, 300, 300, 300);
+    key = "C";
+  }else{
+    fill(315, 300, 300, 150);
+  }
+  arc(width/2, height/2, diameter, diameter, 292.5, 337.5,  PIE);
+
+  colorMode(RGB, 255);
+
+
+  fill(0);
+  textSize(50);
+  textAlign(CENTER, CENTER);
+
+  const corner = Math.sqrt(camHeight/3 * camHeight/3 / 2);
+
+  text('A', centreWidth - corner, centreHeight - corner);
+  text('B', centreWidth, centreHeight - camHeight / 3);
+  text('C', centreWidth + corner, centreHeight - corner);
+  text('D', centreWidth + camHeight / 3, centreHeight);
+  text('E' , centreWidth + corner, centreHeight + corner);
+  text('F' , centreWidth, centreHeight + camHeight / 3);
+  text('G' , centreWidth - corner, centreHeight + corner);
+  textSize(20);
+  text('Random', centreWidth - camHeight / 3, centreHeight);
+
+
+  circle(nosePointKey.x, nosePointKey.y, 20);
 }
 
 function mousePressed() {
@@ -183,4 +349,12 @@ function mousePressed() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  displaySize = { width: windowWidth, height: windowWidth * (input.height / input.width) };
+}
+
+function inversePoints(point){
+  return{
+    x: width -point.x,
+    y: point.y + shiftDown
+  }
 }
