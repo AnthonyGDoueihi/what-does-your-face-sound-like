@@ -47,8 +47,6 @@ const setupAudio = function(){
 
   sequence = new Tone.Sequence( (time, col) => {
 
-    console.log(timelineCount, col)
-
     if( col === 0){
       timelineCount += 1;
     }
@@ -110,6 +108,13 @@ const setupAudio = function(){
         sequence.start('+16n');
       }
 
+    }
+
+    if( timelineCount === 11 ){
+      if( col === steps.length - 1){
+        sequence.stop();
+        Tone.Transport.toggle();
+      }
     }
 
 
