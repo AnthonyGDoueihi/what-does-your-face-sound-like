@@ -14,6 +14,19 @@ const music = {
 
 }
 
+const chordCombinations = {
+    0: [0, 1, 2],
+    1: [0, 1, 3],
+    2: [0, 1, 4],
+    3: [0, 2, 3],
+    4: [0, 2, 4],
+    5: [0, 3, 4],
+    6: [1, 2, 3],
+    7: [1, 2, 4],
+    8: [1, 3, 4],
+    9: [2, 3, 4]
+  }
+
 let timelineCount = 0;
 
 let playChords = false;
@@ -94,9 +107,9 @@ const setupAudio = function(){
       }
 
       if( col % 8 === 0 ){
-        const note1 = notes.chords[music.chords[col/8]][0];
-        const note2 = notes.chords[music.chords[col/8]][1];
-        const note3 = notes.chords[music.chords[col/8]][2];
+        const note1 = chordCombinations[music.chords[col/8]][0];
+        const note2 = chordCombinations[music.chords[col/8]][1];
+        const note3 = chordCombinations[music.chords[col/8]][2];
         chord.triggerAttackRelease(chordNoteArray[note1], '2m');
         chord.triggerAttackRelease(chordNoteArray[note2], '2m');
         chord.triggerAttackRelease(chordNoteArray[note3], '2m');

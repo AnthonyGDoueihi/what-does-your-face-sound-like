@@ -55,11 +55,9 @@ function draw(){
 
     }
 
-
     // Reflip the camera
     scale(-1, 1);
     translate(-width, 0);
-
 
     // Side bars same colour as background to put webcam in a box
     fill(124, 88, 105);
@@ -77,7 +75,7 @@ function draw(){
     fill(200);
     textSize(20);
 
-    drawSmile();
+    
     // All potential things to change and animate over the timeline
     switch (timelineCount) {
       case 0:
