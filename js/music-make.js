@@ -1,5 +1,7 @@
+// Keeping the longer array somewhere neater
 const steps = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63];
 
+// The notes that are edited and played
 const music = {
   drum: {
     kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
@@ -16,6 +18,7 @@ const music = {
 
 }
 
+// The combinations to play chords out of
 const chordCombinations = {
     0: [0, 1, 2],
     1: [0, 1, 3],
@@ -29,19 +32,26 @@ const chordCombinations = {
     9: [2, 3, 4]
   }
 
+// Keep count in the loop
 let timelineCount = 0;
 
+// TODO make do thing
 let isRecording = false;
 
+// Stuff to get the notes to play
 let isGetScale = false;
 let musicScale;
 let isGetKey = false;
 let key;
-let noteArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+// Array of notes to play
+let noteArray;
 let chordNoteArray;
 
+// Full loop
 let sequence;
 
+// Noise makers varaibles
 let clap;
 let kick;
 let openHat;
@@ -49,8 +59,13 @@ let closedHat;
 let melody;
 let chord;
 
+//Recording Melody variables
 let leftEyeStore = "";
 let rightEyeStore = "";
+
+//Recording Chords variables
+let lastDirection = "";
+let currentChord = "";
 
 const setupAudio = function(){
   // Setup drum samples
@@ -65,19 +80,26 @@ const setupAudio = function(){
   // Chord Synth to play 3 notes at a time
   chord = new Tone.PolySynth(3, Tone.Synth).toMaster();
 
+  // The loop
   sequence = new Tone.Sequence( (time, col) => {
 
     if( col === 0){
+      // Increment time in loop
       timelineCount += 1;
 
+      // If on final loop end
       if( timelineCount === 12 ){
-        
-        chord.triggerRelease();
+        chord.releaseAll();
         sequence.stop();
         Tone.Transport.toggle();
       }
+
+      if ( timelineCount === 8 ){
+        chord.releaseAll();
+      }
     }
 
+    // The constant beat through it all
     if ( music.drum.kick[col] === 1 ){
       kick.start(time);
     }
@@ -85,8 +107,8 @@ const setupAudio = function(){
       clap.start(time);
     }
 
-
-    if ( timelineCount === 4 && !noteArray){
+    // Get the notes that the melody and chords can play
+    if ( timelineCount === 4 ){
       if (key === null){
         const randNotes = "ABCDEFG".split("");
         key = randNotes[Math.floor( Math.random() * randNotes.length)];
@@ -96,6 +118,7 @@ const setupAudio = function(){
       chordNoteArray = Tonal.scale(musicScale).map(Tonal.transpose( key + "4"));
     }
 
+    // Record the highhat and play it
     if ( timelineCount === 5 ){
       const headTilt = getValues.headTilt();
       //TODO Throttle this
@@ -109,24 +132,40 @@ const setupAudio = function(){
 
     }
 
+    // Record the chords and play it
     if ( timelineCount === 7 ){
-      //TODO record Chords
+      let currentDirection = "";
+
+      if( nosePointKey.x < averageJawX ){
+        currentDirection = "left";
+      }else{
+        currentDirection = "right";
+      }
+
+      if ( lastDirection !== currentDirection ){
+        lastDirection = currentDirection;
+        const prevCurrent = currentChord;
+        while( currentChord === prevCurrent ){
+          currentChord = Math.floor(random(0, Object.keys(chordCombinations).length));
+        }
+      }
+
+      music.chords[col] = currentChord;
 
       playChord(col);
-      if( col === steps.length - 1 ){
-        //TODO maybe do three?
-        chord.triggerRelease('16n');
-      }
     }
 
-
+    // Record the melody and play it
     if ( timelineCount === 9 ){
       // TODO send this to do a check rather than grab what is there
-      music.melodyLeft = leftEyeStore;
-      music.melodyRight = rightEyeStore;
+      music.melodyLeft[col] = leftEyeStore;
+      console.log(leftEyeStore);
+      music.melodyRight[col] = rightEyeStore;
+      console.log(rightEyeStore);
       playMelody(col);
     }
 
+    // Play the final song
     if ( timelineCount === 11 ){
       //TODO record all and keep in a blob
 
@@ -168,7 +207,7 @@ const playDrum = function(col){
 let lastPlayed = -1;
 
 const playChord = function(col){
-  const notes = music.chords[col/8];
+  const notes = music.chords[col];
 
   if ( lastPlayed !== notes ){
     lastPlayed = notes;

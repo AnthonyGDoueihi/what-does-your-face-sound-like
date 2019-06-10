@@ -72,7 +72,7 @@ function draw(){
 
 
     if (canSeeFace){
-      drawChords();
+      drawEyebrows();
     }else{
 
     }
@@ -143,6 +143,8 @@ function draw(){
         //Record the hats
         text('5', width - 50, 50);
         text("Recording Hats", 50, 50);
+
+        drawEyebrows();
         break;
 
       case 6:
@@ -214,7 +216,7 @@ function drawMelody(){
       y: random(shiftDown, height - shiftDown),
       hue: randomIndex * 360 / noteArray.length,
       size: random(50, 150),
-      note: noteArray[Math.floor(randomIndex)]
+      note: Math.floor(randomIndex)
     })
   }
 
@@ -257,7 +259,7 @@ function drawMelody(){
     noStroke();
     fill(p.hue, 200, 200);
     textAlign(CENTER, CENTER);
-    text(p.note, p.x, p.y);
+    text(noteArray[p.note], p.x, p.y);
   }
 
   colorMode(RGB, 255);
@@ -268,23 +270,25 @@ function drawMelody(){
 
 }
 
+let averageJawX = 0;
+
 function drawChords(){
   if(facePoints){
 
     const jaw = getFacePiece.getJawOutline();
-    const averageJaw = inversePoints(getValues.averagePoints(jaw));
+    averageJawX = inversePoints(getValues.averagePoints(jaw)).x;
 
-    // console.log('flipped', averageJaw.x);
     stroke(0, 0, 255);
-    line(averageJaw.x, shiftDown, averageJaw.x, height - shiftDown);
+    line(averageJawX, shiftDown, averageJawX, height - shiftDown);
 
     nosePointKey = inversePoints(getValues.nosePointer());
-    if( nosePointKey.x < averageJaw.x ){
+
+    if( nosePointKey.x < averageJawX ){
       fill(255, 0, 0, 0.5);
-      rect(sideWidth, shiftDown, averageJaw.x - sideWidth, height - (2 * shiftDown));
+      rect(sideWidth, shiftDown, averageJawX - sideWidth, height - (2 * shiftDown));
     }else{
       fill(255, 0, 0, 0.5);
-      rect(averageJaw.x, shiftDown, averageJaw.x - sideWidth, height - (2 * shiftDown));
+      rect(averageJawX, shiftDown, averageJawX - sideWidth, height - (2 * shiftDown));
     }
 
     fill(255, 255, 255);
@@ -331,6 +335,47 @@ function angleBetweenVectors(x1, y1, x2, y2){
   // console.log('l', lengths);
 
   return acos(dot/lengths);
+}
+
+function drawEyebrows(){
+  const leftBrow = getFacePiece.getLeftEyeBrow();
+
+  beginShape();
+
+  let convertedPoint = inversePoints(leftBrow[leftBrow.length - 1]);
+  curveVertex(convertedPoint.x, convertedPoint.y);
+
+  for ( let i = 0; i < leftBrow.length; i ++){
+    const convertedPoint = inversePoints(leftBrow[i]);
+    curveVertex(convertedPoint.x, convertedPoint.y);
+  }
+
+  convertedPoint = inversePoints(leftBrow[0]);
+  curveVertex(convertedPoint.x, convertedPoint.y);
+  convertedPoint = inversePoints(leftBrow[1]);
+  curveVertex(convertedPoint.x, convertedPoint.y);
+
+  endShape();
+
+  const rightBrow = getFacePiece.getRightEyeBrow();
+
+
+  beginShape();
+
+  let convertedPoint = inversePoints(rightBrow[rightBrow.length - 1]);
+  curveVertex(convertedPoint.x, convertedPoint.y);
+
+  for ( let i = 0; i < rightBrow.length; i ++){
+    const convertedPoint = inversePoints(rightBrow[i]);
+    curveVertex(convertedPoint.x, convertedPoint.y);
+  }
+
+  convertedPoint = inversePoints(rightBrow[0]);
+  curveVertex(convertedPoint.x, convertedPoint.y);
+  convertedPoint = inversePoints(rightBrow[1]);
+  curveVertex(convertedPoint.x, convertedPoint.y);
+
+  endShape();
 }
 
 function keySelection(){
