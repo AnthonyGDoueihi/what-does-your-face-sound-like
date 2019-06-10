@@ -1,7 +1,7 @@
 // Object made to segment the face into pieces for easier use
 const getFacePiece = {
   getJawOutline(relative = false) {
-    return relative ? facePoints.relativePositions.slice(0, 17) : facePointspPositions.slice(0, 17);
+    return relative ? facePoints.relativePositions.slice(0, 17) : facePoints.positions.slice(0, 17);
   },
 
   getLeftEyeBrow(relative = false) {
@@ -39,15 +39,16 @@ const hypot = function(p1, p2){
 // Object to do the calculations needed
 const getValues = {
   averagePoints(points){
-    return points.reduce((acc, pnt) => {
+    const sum = points.reduce((acc, pnt) => {
       return {
-        x: (acc.x + pnt.x) /2,
-        y: (acc.y + pnt.y) /2
+        x: acc.x + pnt.x,
+        y: acc.y + pnt.y
       }
-    }, {
-      x: 0,
-      y: 0
     })
+    return {
+      x: sum.x / points.length,
+      y: sum.y / points.length
+    }
   },
 
   // Check if the edges of the mouth are higher than the average distance of the mouth points to see if it is a smile
@@ -86,5 +87,6 @@ const getValues = {
   nosePointer(){
     const nose = getFacePiece.getNose();
     return nose[3];
-  }
+  },
+
 }

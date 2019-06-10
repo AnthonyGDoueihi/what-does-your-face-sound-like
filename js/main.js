@@ -39,6 +39,7 @@ function draw(){
   if(capture && canvas){
     // Background colour for above and below camera
     noStroke();
+    colorMode(RGB, 255);
     fill(124, 88, 105);
     rect(0, 0, width, height);
 
@@ -48,12 +49,6 @@ function draw(){
     camHeight = width * capture.height / capture.width
     shiftDown = (height - camHeight) / 2;
     image(capture, 0, shiftDown, width, camHeight);
-
-    if (canSeeFace){
-
-    }else{
-
-    }
 
     // Reflip the camera
     scale(-1, 1);
@@ -75,7 +70,13 @@ function draw(){
     fill(200);
     textSize(20);
 
-    
+
+    if (canSeeFace){
+      drawChords();
+    }else{
+
+    }
+
     // All potential things to change and animate over the timeline
     switch (timelineCount) {
       case 0:
@@ -149,13 +150,14 @@ function draw(){
         text('6', width - 50, 50);
         text("The Hats have been recorded", 50, 50);
         text("Time to play some chords", 50, 200);
-        text("Bob Your Head Up and Down To Play a Chord", 50, 350);
+        text("Turn Your Head Side to Side To Change the Chord", 50, 350);
         break;
 
       case 7:
         //Record the chords
         text('7', width - 50, 50);
         text("Recording Chords", 50, 50);
+        drawChords();
         break;
 
       case 8:
@@ -170,6 +172,7 @@ function draw(){
         // Record the Melody
         text('9', width - 50, 50);
         text("Recording Melody", 50, 50);
+        drawMelody();
         break;
 
       case 10:
@@ -193,6 +196,102 @@ function draw(){
 
       }
   }
+}
+
+let particles = [];
+
+// function circle
+
+function drawMelody(){
+  colorMode(HSL, 360);
+  const leftEyePos = inversePoints(getValues.averagePoints(getFacePiece.getLeftEye()));
+  const rightEyePos = inversePoints(getValues.averagePoints(getFacePiece.getRightEye()));
+
+  const addParticle = function(){
+    const randomIndex = random(0, noteArray.length);
+    particles.push({
+      x: random(sideWidth, width - sideWidth),
+      y: random(shiftDown, height - shiftDown),
+      hue: randomIndex * 360 / noteArray.length,
+      size: random(50, 150),
+      note: noteArray[Math.floor(randomIndex)]
+    })
+  }
+
+  if ( frameCount % 60 === 0 ){
+    particles = [];
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+    addParticle();
+  }
+
+  for ( let i = particles.length - 1; i >= 0; i-- ){
+    const p = particles[i];
+
+    if( dist( p.x, p.y, leftEyePos.x, leftEyePos.y ) < p.size/2 ){
+      leftEyeStore = p.note;
+      fill(p.hue, 200, 200, 350)
+    }else if( dist( p.x, p.y, rightEyePos.x, rightEyePos.y ) < p.size/2 ){
+      rightEyeStore = p.note;
+      fill(p.hue, 200, 200, 350);
+    }else{
+      fill(p.hue, 200, 200, 100)
+    }
+
+    stroke( p.hue, 200, 200 );
+    circle( p.x, p.y, p.size );
+
+    noStroke();
+    fill(p.hue, 200, 200);
+    textAlign(CENTER, CENTER);
+    text(p.note, p.x, p.y);
+  }
+
+  colorMode(RGB, 255);
+
+  fill(255, 0, 0);
+  circle( leftEyePos.x, leftEyePos.y, 20 );
+  circle( rightEyePos.x, rightEyePos.y, 20 );
+
+}
+
+function drawChords(){
+  if(facePoints){
+
+    const jaw = getFacePiece.getJawOutline();
+    const averageJaw = inversePoints(getValues.averagePoints(jaw));
+
+    // console.log('flipped', averageJaw.x);
+    stroke(0, 0, 255);
+    line(averageJaw.x, shiftDown, averageJaw.x, height - shiftDown);
+
+    nosePointKey = inversePoints(getValues.nosePointer());
+    if( nosePointKey.x < averageJaw.x ){
+      fill(255, 0, 0, 0.5);
+      rect(sideWidth, shiftDown, averageJaw.x - sideWidth, height - (2 * shiftDown));
+    }else{
+      fill(255, 0, 0, 0.5);
+      rect(averageJaw.x, shiftDown, averageJaw.x - sideWidth, height - (2 * shiftDown));
+    }
+
+    fill(255, 255, 255);
+    circle(nosePointKey.x, nosePointKey.y, 20);
+
+  }
+  noStroke();
 }
 
 function drawSmile(){
@@ -352,7 +451,7 @@ function windowResized() {
 
 function inversePoints(point){
   return{
-    x: width -point.x,
+    x: width - point.x,
     y: point.y + shiftDown
   }
 }

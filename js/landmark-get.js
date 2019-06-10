@@ -3,7 +3,6 @@ let warmedUp = false;
 let displaySize;
 let facePoints;
 
-
 const options = new faceapi.TinyFaceDetectorOptions({
     inputSize: 128,
     scoreThreshold: 0.5
