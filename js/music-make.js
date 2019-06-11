@@ -10,11 +10,11 @@ const music = {
     closedHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   },
 
-  melodyLeft: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  melodyLeft: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
 
-  melodyRight: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  melodyRight: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
 
-  chords: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  chords: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
 
 }
 
@@ -160,10 +160,9 @@ const setupAudio = function(){
     // Record the melody and play it
     if ( timelineCount === 9 ){
       // TODO send this to do a check rather than grab what is there
-      music.melodyLeft[col] = leftEyeStore;
-      console.log(leftEyeStore);
-      music.melodyRight[col] = rightEyeStore;
-      console.log(rightEyeStore);
+
+      removeParticle(col);
+
       playMelody(col);
     }
 
@@ -211,7 +210,7 @@ let lastPlayed = -1;
 const playChord = function(col){
   const notes = music.chords[col];
 
-  if ( lastPlayed !== notes ){
+  if ( lastPlayed !== notes && notes !== -1){
     lastPlayed = notes;
     const toPlay = chordCombinations[notes];
     chord.triggerAttack(chordNoteArray[toPlay[0]]);
@@ -222,8 +221,16 @@ const playChord = function(col){
 }
 
 const playMelody = function(col){
-  melody.triggerAttackRelease( noteArray[music.melodyLeft[col]],'16n');
-  melody.triggerAttackRelease( noteArray[music.melodyRight[col]],'16n');
+  const leftPlay = music.melodyLeft[col];
+  const rightPlay = music.melodyRight[col];
+
+  if( leftPlay !== -1 ){
+    melody.triggerAttackRelease( noteArray[leftPlay],'16n');
+  }
+
+  if( rightPlay !== -1 ){
+    melody.triggerAttackRelease( noteArray[rightPlay],'16n');
+  }
 }
 
 const playButton = function(){

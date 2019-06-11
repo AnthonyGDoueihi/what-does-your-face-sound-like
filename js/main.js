@@ -201,52 +201,67 @@ function draw(){
 }
 
 let particles = [];
+let leftEyePos;
+let rightEyePos;
+
+const removeParticle = function(col){
+  for ( let i = particles.length - 1; i >= 0; i-- ){
+
+    const p = particles[i];
+
+    if( dist( p.x, p.y, leftEyePos.x, leftEyePos.y ) < p.size/2 ){
+      music.melodyLeft[col] = p.note;
+      particles.splice(i, 1);
+      return;
+    }else if( dist( p.x, p.y, rightEyePos.x, rightEyePos.y ) < p.size/2 ){
+      music.melodyRight[col] = p.note;
+      particles.splice(i, 1);
+      return;
+    }
+  }
+}
 
 function drawMelody(){
-  // TODO change this so it works better in tune with the music-make
   colorMode(HSL, 360);
-  const leftEyePos = inversePoints(getValues.averagePoints(getFacePiece.getLeftEye()));
-  const rightEyePos = inversePoints(getValues.averagePoints(getFacePiece.getRightEye()));
+  leftEyePos = inversePoints(getValues.averagePoints(getFacePiece.getLeftEye()));
+  rightEyePos = inversePoints(getValues.averagePoints(getFacePiece.getRightEye()));
 
-  const addParticle = function(){
-    const randomIndex = random(0, noteArray.length);
+
+  const addParticle = function(index){
     particles.push({
-      x: random(sideWidth, width - sideWidth),
-      y: random(shiftDown, height - shiftDown),
-      hue: randomIndex * 360 / noteArray.length,
+      x: random(sideWidth + sideWidth5, width - sideWidth - sideWidth5),
+      y: random(shiftDown + shiftDown / 5, height - shiftDown - shiftDown/5),
+      hue: index * 360 / noteArray.length,
       size: random(50, 150),
-      note: Math.floor(randomIndex)
+      note: Math.floor(index)
     })
   }
 
-  if ( frameCount % 60 === 0 ){
+  if ( frameCount % 20 === 0 ){
+
     particles = [];
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
-    addParticle();
+    for ( let i = 0; i < noteArray.length; i++ ){
+      addParticle(i);
+    }
+
+    for ( let i = 0; i < noteArray.length; i++ ){
+      addParticle(i);
+    }
+
+    for ( let i = 0; i < noteArray.length; i++ ){
+      addParticle(i);
+    }
+
   }
 
   for ( let i = particles.length - 1; i >= 0; i-- ){
     const p = particles[i];
 
     if( dist( p.x, p.y, leftEyePos.x, leftEyePos.y ) < p.size/2 ){
-      leftEyeStore = p.note;
+      // leftEyeStore = p.note;
       fill(p.hue, 200, 200, 350)
     }else if( dist( p.x, p.y, rightEyePos.x, rightEyePos.y ) < p.size/2 ){
-      rightEyeStore = p.note;
+      // rightEyeStore = p.note;
       fill(p.hue, 200, 200, 350);
     }else{
       fill(p.hue, 200, 200, 100)
