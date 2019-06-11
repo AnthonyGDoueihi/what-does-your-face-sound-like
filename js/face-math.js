@@ -1,4 +1,5 @@
 // Object made to segment the face into pieces for easier use
+// Each has a bool that will return either their position in relation to the canvas or to the face itseld
 const getFacePiece = {
   getJawOutline(relative = false) {
     return relative ? facePoints.relativePositions.slice(0, 17) : facePoints.positions.slice(0, 17);
@@ -30,6 +31,7 @@ const getFacePiece = {
 
 }
 
+// Helper function to do some math
 const hypot = function(p1, p2){
     const a = p1.x -  p2.x;
     const b = p1.y -  p2.y;

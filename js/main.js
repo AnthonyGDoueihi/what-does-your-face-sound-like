@@ -3,7 +3,9 @@ let canvas;
 let capture;
 let canSeeFace = false;
 
+// p5 setup, draw does not wait for this to finish but still needs to be async to wait for the models and camera to load before running other important functions
 async function setup(){
+  // Some global setting changes
   angleMode(DEGREES);
   textFont('Georgia');
 
@@ -17,11 +19,15 @@ async function setup(){
   capture = await createCapture(VIDEO);
 
   input = capture.elt;
+  // Right call of the loop in landmark-get
   setTimeout(detection, 0);
+  // hides the cameras capture itself so we can project to canvas
   capture.hide();
+  // Gets the audio ready
   setupAudio();
 }
 
+// global measurement settings used in many functions
 let sideWidth;
 let height8;
 let sideWidth5;
@@ -29,14 +35,17 @@ let sideWidth5;
 let shiftDown;
 let camHeight;
 
+// where the nose points, used in a few places
 let nosePointKey = { x:0, y:0 };
 
 function draw(){
+  // Sets the global measurements each time
   sideWidth = width / 5;
   height8 = height / 8;
   sideWidth5 = sideWidth / 5;
   textAlign(LEFT, TOP)
 
+  // If we have a webcam stream and a canvas to project it onto
   if(capture && canvas){
     // Background colour for above and below camera
     noStroke();
@@ -69,16 +78,9 @@ function draw(){
 
     noStroke();
     fill(200);
-    textSize(20);
-
-    if (canSeeFace){
-//TODO put something here that shows how big the face should be when not visible
-    }else{
-
-    }
-
-
+    // Sets the text size to a constant size based off of screen Width and the longest string that needs to be printed
     textSize(Math.floor(textSize() / textWidth('What Sound Does Your Face Make?') * ( width - sideWidth5 - sideWidth5 )));
+
     // All potential things to change and animate over the timeline
     switch (timelineCount) {
       case 0:
@@ -183,7 +185,7 @@ function draw(){
         break;
 
       case 6:
-        //Well done & How to do the chords
+        // How to do the chords
         textAlign(CENTER, BOTTOM);
         countdownTimer();
 
@@ -216,7 +218,7 @@ function draw(){
         break;
 
       case 8:
-        // Well done & How to do the melody
+        // How to do the melody
         textAlign(CENTER, BOTTOM);
         countdownTimer();
 
@@ -277,6 +279,7 @@ function draw(){
         fill(88,124,107);
         text(tiwyfsl, sideWidth5, height - height8/2, width - sideWidth5);
 
+        // Stops calling draw() every frame when there is no more need
         noLoop();
         break;
 
@@ -284,16 +287,22 @@ function draw(){
         return;
 
       }
+
+      // If the face isnt visible, show them where their face should be
+      if (!canSeeFace){
+        drawFace();
+      }
+
   }
 }
 
+// variables to store and create the melody
 let particles = [];
 let leftEyePos;
 let rightEyePos;
-
 let startFrame;
 
-
+// When particle is in the eye remove it and add it to the music. Called every music beat
 const removeParticle = function(col){
   for ( let i = particles.length - 1; i >= 0; i-- ){
 
@@ -311,10 +320,12 @@ const removeParticle = function(col){
   }
 }
 
+// called once to start set the starting frame as the current frame
 function startMelody(){
   startFrame = frameCount;
 }
 
+// draw all the orbs that can become music notes, called every frame rather than every music beat
 function drawMelody(){
   colorMode(HSL, 360);
   leftEyePos = inversePoints(getValues.averagePoints(getFacePiece.getLeftEye()));
@@ -331,6 +342,7 @@ function drawMelody(){
     })
   }
 
+  // create 4 times of each note every 20 frames
   if ( (frameCount - startFrame) % 20 === 1 ){
 
     particles = [];
@@ -350,16 +362,16 @@ function drawMelody(){
       addParticle(i);
     }
 
+
   }
 
+  // draws all the particles
   for ( let i = particles.length - 1; i >= 0; i-- ){
     const p = particles[i];
 
     if( dist( p.x, p.y, leftEyePos.x, leftEyePos.y ) < p.size/2 ){
-      // leftEyeStore = p.note;
       fill(p.hue, 200, 200, 350)
     }else if( dist( p.x, p.y, rightEyePos.x, rightEyePos.y ) < p.size/2 ){
-      // rightEyeStore = p.note;
       fill(p.hue, 200, 200, 350);
     }else{
       fill(p.hue, 200, 200, 100)
@@ -375,6 +387,8 @@ function drawMelody(){
     text(noteArray[p.note], p.x, p.y);
   }
 
+
+  // draws the current position of the eyes
   colorMode(RGB, 255);
 
   fill(255, 0, 0);
@@ -383,16 +397,14 @@ function drawMelody(){
 
 }
 
-let averageJawX = 0;
-
+// Gets the middle of your face according to the jaw and checks which side the nose is to colour it
 function drawChords(){
   if(facePoints){
 
     const jaw = getFacePiece.getJawOutline();
-    averageJawX = inversePoints(getValues.averagePoints(jaw)).x;
+    const averageJawX = inversePoints(getValues.averagePoints(jaw)).x;
 
     stroke(0, 0, 255);
-    // line(averageJawX, shiftDown, averageJawX, height - shiftDown);
 
     nosePointKey = inversePoints(getValues.nosePointer());
 
@@ -411,13 +423,11 @@ function drawChords(){
   noStroke();
 }
 
+// Get the mouth and draw it, if its a smile show the smile, otherwise show the frowny
 function drawSmile(){
   if(facePoints){
     const mouth = getFacePiece.getMouth();
     noFill();
-
-    // \u1F600 smile
-    // \u2639 frown
 
     if( getValues.isSmile() ){
       stroke(0, 0, 255);
@@ -429,13 +439,14 @@ function drawSmile(){
       text('\u2639', width - sideWidth5, height/2);
     }
 
+    // loop through the mouth points and draw lines between each, include a few extra at the start and end to make the shape whole
     beginShape();
 
     let convertedPoint = inversePoints(mouth[mouth.length - 1]);
     curveVertex(convertedPoint.x, convertedPoint.y);
 
     for ( let i = 0; i < mouth.length; i ++){
-      const convertedPoint = inversePoints(mouth[i]);
+      convertedPoint = inversePoints(mouth[i]);
       curveVertex(convertedPoint.x, convertedPoint.y);
     }
 
@@ -449,6 +460,7 @@ function drawSmile(){
   noStroke();
 }
 
+// helper function to know the angle between two points
 function angleBetweenVectors(x1, y1, x2, y2){
   const dot = x1 * x2 + y1 * y2;
   const lengths = hypot({ x:0, y:0 },{ x:x1, y:y1 } ) * hypot({ x:0, y:0 },{ x:x2, y:y2 } );
@@ -456,12 +468,14 @@ function angleBetweenVectors(x1, y1, x2, y2){
   return acos(dot/lengths);
 }
 
+// Get the cheeks by averaging jaw sides and use it to tell the user if their head is tilted
 function drawHeadTiltMeasures(){
   colorMode(RGB, 255);
   let jaw = getFacePiece.getJawOutline();
 
   const leftAverage = inversePoints(getValues.averagePoints(jaw.slice(0, jaw.length/2)));
   const rightAverage = inversePoints(getValues.averagePoints(jaw.slice(jaw.length/2 ,jaw.length)));
+
   textAlign(CENTER, CENTER);
   textSize(50);
   //left and right are swapped due to camera flip
@@ -494,6 +508,7 @@ function drawHeadTiltMeasures(){
 
 }
 
+// Create a pie graph with all options and use the nose pointer to see which key to use
 function keySelection(){
   push();
   // To Point with the Nose
@@ -507,9 +522,13 @@ function keySelection(){
   const diameter = height - (2 * shiftDown) - 5;
   const centreWidth = width/2;
   const centreHeight = height/2
+
   let angleOfNose = angleBetweenVectors( centreWidth + camHeight / 3 - width/2, centreHeight - height/2, nosePointKey.x - width/2, nosePointKey.y - height/2);
+
+  // the angle returns the smallest always, so check if it is below the halfway point, if so shift it down
   angleOfNose = nosePointKey.y < centreHeight ? 360 - angleOfNose : angleOfNose;
 
+  // Create the pie and if the nose is withing make the opacity higher. Also change a variable in the music-make so it does not have to redo these calculations
   if( (angleOfNose < 22.5 && angleOfNose > 0) || (angleOfNose < 360 && angleOfNose > 337.5 )){
     fill(0, 300, 300, 300);
     key = "D";
@@ -584,7 +603,7 @@ function keySelection(){
   textAlign(CENTER, CENTER);
 
   const corner = Math.sqrt(camHeight/3 * camHeight/3 / 2);
-
+  // Fill the pie with text to show which is which
   text('A', centreWidth - corner, centreHeight - corner);
   text('B', centreWidth, centreHeight - camHeight / 3);
   text('C', centreWidth + corner, centreHeight - corner);
@@ -600,17 +619,20 @@ function keySelection(){
   pop();
 }
 
+// To press the play button
 function mousePressed() {
   if ( timelineCount === 0 && mouseX < 4 * sideWidth5 && mouseX > sideWidth5 && mouseY < 2 * height8 && mouseY > height8){
     playButton();
   }
 }
 
+// If the window size changes, change the variables to make it semi-responsive
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   displaySize = { width: windowWidth, height: windowWidth * (input.height / input.width) };
 }
 
+// Since the camera view is flipped and shifted down on the canvas, the face landmarks retrieved are slighty off, this helper adjusts it accordingly
 function inversePoints(point){
   return{
     x: width - point.x,
@@ -618,17 +640,18 @@ function inversePoints(point){
   }
 }
 
+// When called set the timer to the amount of columns in the sequence to play
 let timeLeft;
-
 function newTimer(){
   timeLeft = 32;
   startFrame = frameCount;
 }
-
+// called each column
 function timerTick(){
   timeLeft --;
 }
 
+// draw function for the timer, when the timer is ticked this will change
 function countdownTimer(){
   push();
   stroke(0);
@@ -646,6 +669,7 @@ function countdownTimer(){
 
 let c = 0
 let angle = 0;
+// Pretty art thing for the end, loop through and draw circles in a circle pattern
 function flowersOfLife(){
   colorMode(HSB, 255);
 
@@ -674,4 +698,72 @@ function flowersOfLife(){
 
 	c += 2;
 	angle += 0.5;
+}
+
+// draws a makeshift face so the user knows where their face should be
+function drawFace(){
+  const camWidth = width - 2 * sideWidth;
+  noFill();
+  stroke(100, 100, 255);
+
+// Jaw
+  beginShape();
+
+  curveVertex( sideWidth + (camWidth * 0.249), shiftDown + (camHeight * 0.319));
+  curveVertex( sideWidth + (camWidth * 0.272), shiftDown + (camHeight * 0.385));
+  curveVertex( sideWidth + (camWidth * 0.298), shiftDown + (camHeight * 0.451));
+  curveVertex( sideWidth + (camWidth * 0.302), shiftDown + (camHeight * 0.506));
+  curveVertex( sideWidth + (camWidth * 0.321), shiftDown + (camHeight * 0.571));
+  curveVertex( sideWidth + (camWidth * 0.353), shiftDown + (camHeight * 0.622));
+  curveVertex( sideWidth + (camWidth * 0.389), shiftDown + (camHeight * 0.666));
+  curveVertex( sideWidth + (camWidth * 0.431), shiftDown + (camHeight * 0.705));
+  curveVertex( sideWidth + (camWidth * 0.5), shiftDown + (camHeight * 0.727));
+  curveVertex( sideWidth + (camWidth * 0.569), shiftDown + (camHeight * 0.705));
+  curveVertex( sideWidth + (camWidth * 0.611), shiftDown + (camHeight * 0.666));
+  curveVertex( sideWidth + (camWidth * 0.647), shiftDown + (camHeight * 0.622));
+  curveVertex( sideWidth + (camWidth * 0.679), shiftDown + (camHeight * 0.571));
+  curveVertex( sideWidth + (camWidth * 0.698), shiftDown + (camHeight * 0.506));
+  curveVertex( sideWidth + (camWidth * 0.702), shiftDown + (camHeight * 0.451));
+  curveVertex( sideWidth + (camWidth * 0.728), shiftDown + (camHeight * 0.385));
+  curveVertex( sideWidth + (camWidth * 0.751), shiftDown + (camHeight * 0.319));
+
+
+  endShape();
+
+//Eyes
+  beginShape();
+
+  curveVertex( sideWidth + (camWidth * 0.413), shiftDown + (camHeight * 0.394));
+  curveVertex( sideWidth + (camWidth * 0.385), shiftDown + (camHeight * 0.374));
+
+  curveVertex( sideWidth + (camWidth * 0.413), shiftDown + (camHeight * 0.36));
+  curveVertex( sideWidth + (camWidth * 0.443), shiftDown + (camHeight * 0.366));
+
+  curveVertex( sideWidth + (camWidth * 0.469), shiftDown + (camHeight * 0.374));
+
+  curveVertex( sideWidth + (camWidth * 0.443), shiftDown + (camHeight * 0.388));
+  curveVertex( sideWidth + (camWidth * 0.413), shiftDown + (camHeight * 0.394));
+
+  curveVertex( sideWidth + (camWidth * 0.385), shiftDown + (camHeight * 0.374));
+  curveVertex( sideWidth + (camWidth * 0.413), shiftDown + (camHeight * 0.36));
+  endShape();
+
+  //Eyes
+  beginShape();
+
+  curveVertex( sideWidth + (camWidth * 0.587), shiftDown + (camHeight * 0.394));
+  curveVertex( sideWidth + (camWidth * 0.615), shiftDown + (camHeight * 0.374));
+
+  curveVertex( sideWidth + (camWidth * 0.587), shiftDown + (camHeight * 0.36));
+  curveVertex( sideWidth + (camWidth * 0.557), shiftDown + (camHeight * 0.366));
+
+  curveVertex( sideWidth + (camWidth * 0.531), shiftDown + (camHeight * 0.374));
+
+  curveVertex( sideWidth + (camWidth * 0.557), shiftDown + (camHeight * 0.388));
+  curveVertex( sideWidth + (camWidth * 0.587), shiftDown + (camHeight * 0.394));
+
+  curveVertex( sideWidth + (camWidth * 0.615), shiftDown + (camHeight * 0.374));
+  curveVertex( sideWidth + (camWidth * 0.587), shiftDown + (camHeight * 0.36));
+
+  endShape();
 }

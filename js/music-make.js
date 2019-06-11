@@ -32,11 +32,8 @@ const chordCombinations = {
     9: [2, 3, 4]
   }
 
-// Keep count in the loop
+// Keep track of how many times the sequence has played
 let timelineCount = 0;
-
-// TODO make do thing
-let isRecording = false;
 
 // Stuff to get the notes to play
 let isGetScale = false;
@@ -74,6 +71,7 @@ const recorder = new MediaRecorder(dest.stream);
 const chunks = [];
 const audio = document.querySelector('audio');
 
+
 const setupAudio = function(){
   // Setup drum samples
   clap = new Tone.Player('./assets/CLAP.mp3').connect(dest).toMaster();
@@ -104,19 +102,21 @@ const setupAudio = function(){
   sequence = new Tone.Sequence( (time, col) => {
 
     if( col === 0){
-      // Increment time in loop
+      // Increment times in loop
       timelineCount += 1;
 
       if ( timelineCount === 8 ){
+        // Need to stop the chords from playing since they are attacked but not released (started but not stopped)
         chord.releaseAll();
       }
 
       if ( timelineCount === 9 ){
+        // Calls the p5 function
         startMelody();
       }
 
-      // If on final loop end
       if( timelineCount === 11 ){
+        // Start the Web Audio recorder
         recorder.start();
       }
 
@@ -128,12 +128,14 @@ const setupAudio = function(){
       }
 
       if ( [4, 6, 8, 10].includes(timelineCount) ){
+        // Calls the p5 function to reset the timer
         newTimer();
       }
 
     }
 
     if ( [4, 6, 8, 10].includes(timelineCount) ){
+      // Calls the p5 function make the timer in time with the music
       timerTick();
     }
 
@@ -158,10 +160,9 @@ const setupAudio = function(){
 
     }
 
-    // Record the highhat and play it
+    // Record the drums and play it
     if ( timelineCount === 5 ){
       const headTilt = getValues.headTilt();
-      //TODO Throttle this
       if( headTilt === 'left' ){
         music.drum.rimshot[col] = 1;
       }else if ( headTilt === 'right' ){
@@ -181,7 +182,7 @@ const setupAudio = function(){
       }else{
         currentDirection = "right";
       }
-
+      // If the direction changed, play a new chord
       if ( lastDirection !== currentDirection ){
         lastDirection = currentDirection;
         const prevCurrent = currentChord;
@@ -197,27 +198,28 @@ const setupAudio = function(){
 
     // Record the melody and play it
     if ( timelineCount === 9 ){
-
+      // p5 function that checks where the nose is compared to the circles
       removeParticle(col);
       playMelody(col);
     }
 
     // Play the final song
     if ( timelineCount === 11 ){
-
-
       playMelody(col);
       playChord(col);
       playDrum(col);
       if( col === steps.length - 1){
+        //Stop the Web Audio recorder
         recorder.stop();
       }
 
     }
 
+    // Check if this needs to be a half-sequence rather than the full sequence
     if( [1, 2, 3, 4, 6, 8, 10].includes(timelineCount) ){
       if( col === (steps.length/2) - 1){
 
+        // Record the smile value for the scale
         if ( timelineCount === 2 ){
           musicScale = getValues.isSmile() ? 'major pentatonic' : "minor pentatonic";
         }
@@ -232,6 +234,7 @@ const setupAudio = function(){
   }, steps, '16n');
 }
 
+// play the sample if the music object above says to 1 is play, 0 is not play
 const playDrum = function(col){
   if ( music.drum.rimshot[col] === 1 ){
     rimshot.start();
@@ -240,11 +243,10 @@ const playDrum = function(col){
   if ( music.drum.snare[col] === 1 ){
     snare.start();
   }
-
 }
 
+// play a new chord if the lastPlayed is different to the one to play in this index of the music object. -1 is to not play at all, otherwise check the note array to find what to play
 let lastPlayed = -1;
-
 const playChord = function(col){
   const notes = music.chords[col];
 
@@ -258,6 +260,7 @@ const playChord = function(col){
 
 }
 
+// play the melody, -1 is to not play, otherwise check the note array
 const playMelody = function(col){
   const leftPlay = music.melodyLeft[col];
   const rightPlay = music.melodyRight[col];
@@ -271,11 +274,13 @@ const playMelody = function(col){
   }
 }
 
+// The play button that starts everything
 const playButton = function(){
   sequence.start();
   Tone.Transport.toggle();
 }
 
+// Event listeners that record the music data and puts it in an audio element when completed
 recorder.ondataavailable = event => chunks.push(event.data);
 recorder.onstop = event => {
   let blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });

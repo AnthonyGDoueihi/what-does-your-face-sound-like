@@ -1,16 +1,23 @@
+// settings for the model
 const useTinyModel = true;
+const options = new faceapi.TinyFaceDetectorOptions({
+  inputSize: 128,
+  scoreThreshold: 0.5
+})
+
+// Checks if everything is ready to do its work
 let warmedUp = false;
+
+// Variables that can change and is needed in many places
 let displaySize;
 let facePoints;
 
-const options = new faceapi.TinyFaceDetectorOptions({
-    inputSize: 128,
-    scoreThreshold: 0.5
-})
 
 const detection = async function(){
+  // Adds this to the callstack to run after this is finished
   setTimeout(detection, 0);
 
+  // If not ready, check if ready then set the necessary variables
   if(!warmedUp){
     if (input.height){
       warmedUp = true;
@@ -19,6 +26,7 @@ const detection = async function(){
     return;
   }
 
+  // Async dunction to get the face landmarks and store it in a global variable
   const results = await getLandmarks();
   if ( results ){
     facePoints = results;
