@@ -5,6 +5,7 @@ let canSeeFace = false;
 
 async function setup(){
   angleMode(DEGREES);
+  textFont('Georgia');
 
   canvas = createCanvas(windowWidth, windowHeight).elt;
 
@@ -77,21 +78,19 @@ function draw(){
 
     }
 
+
+    textSize(Math.floor(textSize() / textWidth('What Sound Does Your Face Make?') * ( width - sideWidth5 - sideWidth5 )));
     // All potential things to change and animate over the timeline
     switch (timelineCount) {
       case 0:
       //Before the original play
-        text('0', width - 50, 50);
-
         // Title
+        textAlign(LEFT, BOTTOM);
         const heading = 'What Sound Does Your Face Make?';
-        textSize(Math.floor(textSize() / textWidth(heading) * ( width - sideWidth5 - sideWidth5 )));
-
-        fill(243, 242, 235);
-        text(heading, sideWidth5 + 4, height - height8 + 4, width - sideWidth5 + 4);
-        fill(57, 80, 54);
-        text(heading, sideWidth5, height - height8, width - sideWidth5);
-
+        fill(0);
+        text(heading, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(heading, sideWidth5, height - height8/2, width - sideWidth5);
 
         // Play Button functionality below
         fill(157,150,184);
@@ -103,30 +102,47 @@ function draw(){
 
       case 1:
         //How to play
-        text('1', width - 50, 50);
-        text("Follow the Instructions", 50, 50);
-        text("To Make Music", 50, 200);
+
+        textAlign(CENTER, BOTTOM);
+        const fti = 'Follow the Instructions!';
+        fill(0);
+        text(fti, sideWidth5 + 4, height - 3 * height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(fti, sideWidth5, height - 3 * height8/2, width - sideWidth5);
+
+        const tmm = 'To Make Music';
+        fill(0);
+        text(tmm, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(tmm, sideWidth5, height - height8/2, width - sideWidth5);
         break;
 
       case 2:
         // Which Scale?
-        text('2', width - 50, 50);
-        text("Which Scale?", 50, 50);
-        text("Smile for Major", 50, 200);
-        text("Frown for Minor", 50, 350);
+        textAlign(CENTER, BOTTOM);
+        const ws = 'Which Scale?';
+        fill(0);
+        text(ws, sideWidth5 + 4, height - 3 * height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(ws, sideWidth5, height - 3 * height8/2, width - sideWidth5);
+
+        const sfmffm = 'Smile for Major Frown for Minor';
+        fill(0);
+        text(sfmffm, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(sfmffm, sideWidth5, height - height8/2, width - sideWidth5);
+
         drawSmile();
-        if( getValues.isSmile() ){
-          text("Smile", width - 100, 200);
-        }else{
-          text("Frown", width - 100, 200);
-        }
         break;
 
       case 3:
         // Which Key
-        text('3', width - 50, 50);
-        text("Which Key?", 50, 50);
-        text("Point with your nose", 50, 200);
+        textAlign(CENTER, BOTTOM);
+        const wk = 'Which Key? Use Your Nose';
+        fill(0);
+        text(wk, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(wk, sideWidth5, height - height8/2, width - sideWidth5);
 
         keySelection();
 
@@ -134,61 +150,123 @@ function draw(){
 
       case 4:
         //How to do the hats
-        text('4', width - 50, 50);
-        text("Get ready to play the high hats", 50, 50);
-        text("Tilt your head to play", 50, 200);
+        textAlign(CENTER, BOTTOM);
+
+        const tyh = 'Tilt Your Head.';
+        fill(0);
+        text(tyh, sideWidth5 + 4, height - 3 * height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(tyh, sideWidth5, height - 3 * height8/2, width - sideWidth5);
+
+        const tptd = 'To Play the Drums';
+        fill(0);
+        text(tptd, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(tptd, sideWidth5, height - height8/2, width - sideWidth5);
+
+        countdownTimer();
+
         break;
 
       case 5:
-        //Record the hats
-        text('5', width - 50, 50);
-        text("Recording Hats", 50, 50);
+        //Record the drums
+        textAlign(CENTER, BOTTOM);
+
+        const rd = 'Recording';
+        fill(0);
+        text(rd, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(rd, sideWidth5, height - height8/2, width - sideWidth5);
 
         drawHeadTiltMeasures();
         break;
 
       case 6:
         //Well done & How to do the chords
-        text('6', width - 50, 50);
-        text("The Hats have been recorded", 50, 50);
-        text("Time to play some chords", 50, 200);
-        text("Turn Your Head Side to Side To Change the Chord", 50, 350);
+        textAlign(CENTER, BOTTOM);
+
+        const syhsts = 'Shake Your Head Side to Side.';
+        fill(0);
+        text(syhsts, sideWidth5 + 4, height - 3 * height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(syhsts, sideWidth5, height - 3 * height8/2, width - sideWidth5);
+
+        const tctc = 'To Change the Chord';
+        fill(0);
+        text(tctc, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(tctc, sideWidth5, height - height8/2, width - sideWidth5);
+
+        countdownTimer();
+
         break;
 
       case 7:
         //Record the chords
-        text('7', width - 50, 50);
-        text("Recording Chords", 50, 50);
+        textAlign(CENTER, BOTTOM);
+
+        const rc = 'Recording';
+        fill(0);
+        text(rc, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(rc, sideWidth5, height - height8/2, width - sideWidth5);
+
         drawChords();
         break;
 
       case 8:
         // Well done & How to do the melody
-        text('8', width - 50, 50);
-        text("The Chords have been recorded", 50, 50);
-        text("Time to play the melody", 50, 200);
-        text("Move your head across the screen To Play the Melody", 50, 350);
+        textAlign(CENTER, BOTTOM);
+
+        const myhats = 'Move Your Head Around the Screen.';
+        fill(0);
+        text(myhats, sideWidth5 + 4, height - 3 * height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(myhats, sideWidth5, height - 3 * height8/2, width - sideWidth5);
+
+        const tptm = 'To Play the Melody';
+        fill(0);
+        text(tptm, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(tptm, sideWidth5, height - height8/2, width - sideWidth5);
+
+        countdownTimer();
+
         break;
 
       case 9:
         // Record the Melody
-        text('9', width - 50, 50);
-        text("Recording Melody", 50, 50);
+        textAlign(CENTER, BOTTOM);
+
+        const rm = 'Recording';
+        fill(0);
+        text(rm, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(rm, sideWidth5, height - height8/2, width - sideWidth5);
+
         drawMelody();
         break;
 
       case 10:
         // Congradulations!!!!
-        text('10', width - 50, 50);
-        text("The Melody have been recorded", 50, 50);
+        textAlign(CENTER, BOTTOM);
+
+        const rftfs = 'Ready for the Final Song?';
+        fill(0);
+        text(rftfs, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(rftfs, sideWidth5, height - height8/2, width - sideWidth5);
+
+        countdownTimer();
         break;
 
       case 11:
-        text('11', width - 50, 50);
-        text("This is the final song")
+      //TODO dont know tf to do here
+      //Record camera maybe?
         break;
 
       case 12:
+      //TODO dont know tf to do here
         text('12', width - 50, 50);
         text("THE END")
         break;
@@ -204,6 +282,9 @@ let particles = [];
 let leftEyePos;
 let rightEyePos;
 
+let startFrame;
+
+
 const removeParticle = function(col){
   for ( let i = particles.length - 1; i >= 0; i-- ){
 
@@ -212,13 +293,17 @@ const removeParticle = function(col){
     if( dist( p.x, p.y, leftEyePos.x, leftEyePos.y ) < p.size/2 ){
       music.melodyLeft[col] = p.note;
       particles.splice(i, 1);
-      return;
+      continue;
     }else if( dist( p.x, p.y, rightEyePos.x, rightEyePos.y ) < p.size/2 ){
       music.melodyRight[col] = p.note;
       particles.splice(i, 1);
-      return;
+      continue;
     }
   }
+}
+
+function startMelody(){
+  startFrame = frameCount;
 }
 
 function drawMelody(){
@@ -229,17 +314,21 @@ function drawMelody(){
 
   const addParticle = function(index){
     particles.push({
-      x: random(sideWidth + sideWidth5, width - sideWidth - sideWidth5),
-      y: random(shiftDown + shiftDown / 5, height - shiftDown - shiftDown/5),
+      x: random(sideWidth + 2 * sideWidth5, width - sideWidth - 2 * sideWidth5),
+      y: random(shiftDown + 2 * shiftDown / 5, height - shiftDown - 2 * shiftDown/5),
       hue: index * 360 / noteArray.length,
       size: random(50, 150),
       note: Math.floor(index)
     })
   }
 
-  if ( frameCount % 20 === 0 ){
+  if ( (frameCount - startFrame) % 20 === 1 ){
 
     particles = [];
+    for ( let i = 0; i < noteArray.length; i++ ){
+      addParticle(i);
+    }
+
     for ( let i = 0; i < noteArray.length; i++ ){
       addParticle(i);
     }
@@ -273,6 +362,7 @@ function drawMelody(){
     noStroke();
     fill(p.hue, 200, 200);
     textAlign(CENTER, CENTER);
+    textSize(30);
     text(noteArray[p.note], p.x, p.y);
   }
 
@@ -302,7 +392,7 @@ function drawChords(){
       rect(sideWidth, shiftDown, averageJawX - sideWidth, height - (2 * shiftDown));
     }else{
       fill(255, 0, 0, 0.5);
-      rect(averageJawX, shiftDown, averageJawX - sideWidth, height - (2 * shiftDown));
+      rect(averageJawX, shiftDown, width - averageJawX + sideWidth, height - (2 * shiftDown));
     }
 
     fill(255, 255, 255);
@@ -316,10 +406,18 @@ function drawSmile(){
   if(facePoints){
     const mouth = getFacePiece.getMouth();
     noFill();
+
+    // \u1F600 smile
+    // \u2639 frown
+
     if( getValues.isSmile() ){
       stroke(0, 0, 255);
+      text('😀', 2 * sideWidth5, height/2);
+      text('😀', width - sideWidth5, height/2);
     }else{
       stroke(255, 0, 0);
+      text('\u2639', 2 * sideWidth5, height/2);
+      text('\u2639', width - sideWidth5, height/2);
     }
 
     beginShape();
@@ -353,35 +451,38 @@ function angleBetweenVectors(x1, y1, x2, y2){
 
 function drawHeadTiltMeasures(){
   colorMode(RGB, 255);
-  const leftAverage = inversePoints(getValues.averagePoints(getFacePiece.getLeftEyeBrow()));
-  const rightAverage = inversePoints(getValues.averagePoints(getFacePiece.getRightEyeBrow()));
+  let jaw = getFacePiece.getJawOutline();
+
+  const leftAverage = inversePoints(getValues.averagePoints(jaw.slice(0, jaw.length/2)));
+  const rightAverage = inversePoints(getValues.averagePoints(jaw.slice(jaw.length/2 ,jaw.length)));
   textAlign(CENTER, CENTER);
+  textSize(50);
   //left and right are swapped due to camera flip
   if( getValues.headTilt() === 'left' ){
     fill(255, 255, 0, 200);
-    circle(leftAverage.x, leftAverage.y, 100);
+    circle(leftAverage.x, leftAverage.y, 150);
 
     fill(255, 255, 0, 100);
-    circle(rightAverage.x, rightAverage.y, 100);
+    circle(rightAverage.x, rightAverage.y, 150);
 
     fill(10);
-    text('right', leftAverage.x, leftAverage.y);
+    text('Right', leftAverage.x, leftAverage.y);
 
   }else if ( getValues.headTilt() === 'right' ){
     fill(255, 255, 0, 100);
-    circle(leftAverage.x, leftAverage.y, 100);
+    circle(leftAverage.x, leftAverage.y, 150);
 
     fill(255, 255, 0, 200);
-    circle(rightAverage.x, rightAverage.y, 100);
+    circle(rightAverage.x, rightAverage.y, 150);
 
     fill(10);
-    text('left', rightAverage.x, rightAverage.y);
+    text('Left', rightAverage.x, rightAverage.y);
   }else{
     fill(255, 255, 0, 100);
-    circle(leftAverage.x, leftAverage.y, 100);
+    circle(leftAverage.x, leftAverage.y, 150);
 
     fill(255, 255, 0, 100);
-    circle(rightAverage.x, rightAverage.y, 100);
+    circle(rightAverage.x, rightAverage.y, 150);
   }
 
 }
@@ -507,4 +608,21 @@ function inversePoints(point){
     x: width - point.x,
     y: point.y + shiftDown
   }
+}
+
+let timeLeft;
+
+function newTimer(){
+  timeLeft = 4;
+  startFrame = frameCount;
+}
+
+function countdownTimer(){
+  if ( (frameCount - startFrame) % 20 === 0 && timeLeft > 0 ){
+    timeLeft --;
+  }
+
+  textAlign(CENTER, CENTER);
+  textSize(100);
+  text(timeLeft, width/2, height/2);
 }

@@ -71,14 +71,23 @@ const setupAudio = function(){
   // Setup drum samples
   clap = new Tone.Player('./assets/CLAP.mp3').toMaster();
   kick = new Tone.Player('./assets/KICK.mp3').toMaster();
-  openHat = new Tone.Player('./assets/OPENHIHAT.mp3').toMaster();
-  closedHat = new Tone.Player('./assets/CLOSEDHAT.mp3').toMaster();
+  // openHat = new Tone.Player('./assets/OPENHIHAT.mp3').toMaster();
+  openHat = new Tone.Player('./assets/RIMSHOT.mp3').toMaster();
+  // closedHat = new Tone.Player('./assets/CLOSEDHAT.mp3').toMaster();
+  closedHat = new Tone.Player('./assets/SNARE.mp3').toMaster();
 
   // Melody Synth to play only one or two notes at a time
   melody = new Tone.PolySynth(2, Tone.Synth).toMaster();
 
   // Chord Synth to play 3 notes at a time
-  chord = new Tone.PolySynth(3, Tone.Synth).toMaster();
+  chord = new Tone.PolySynth(3, Tone.Synth, {
+    envelope  : {
+        attack  : 0.2,
+        decay  : 0.5,
+        sustain  : 0,
+        release  : 0.4
+    }
+  }).toMaster();
 
   // The loop
   sequence = new Tone.Sequence( (time, col) => {
@@ -97,6 +106,15 @@ const setupAudio = function(){
       if ( timelineCount === 8 ){
         chord.releaseAll();
       }
+
+      if ( timelineCount === 9 ){
+        startMelody();
+      }
+
+      if ( [4, 6, 8, 10].includes(timelineCount) ){
+        newTimer();
+      }
+
     }
 
     // The constant beat through it all
@@ -159,10 +177,8 @@ const setupAudio = function(){
 
     // Record the melody and play it
     if ( timelineCount === 9 ){
-      // TODO send this to do a check rather than grab what is there
 
       removeParticle(col);
-
       playMelody(col);
     }
 
@@ -237,24 +253,3 @@ const playButton = function(){
   sequence.start();
   Tone.Transport.toggle();
 }
-
-// 0: Before the original play
-//1: How to play
-//2: Which Scale?
-//3: Which Key?
-//4: How to do the hats
-//5: Record the hats - full
-//6: Well Done
-// 6.5: How to do the chords
-//7: Record the Chords - full
-//8: Well Done
-// 8.5: How to do the melody
-//9: Record the Melody - full
-//10: You done did it!
-//11: Full playback and record
-//12: The end, stop playing
-
-//For testing remove later
-document.addEventListener('keypress', (e) => {
-
-})
