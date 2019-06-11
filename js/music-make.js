@@ -124,7 +124,6 @@ const setupAudio = function(){
       if( timelineCount === 12 ){
         chord.releaseAll();
         sequence.stop();
-        recorder.stop();
         Tone.Transport.toggle();
       }
 
@@ -205,12 +204,14 @@ const setupAudio = function(){
 
     // Play the final song
     if ( timelineCount === 11 ){
-      //TODO record all and keep in a blob
+
 
       playMelody(col);
       playChord(col);
       playDrum(col);
-
+      if( col === steps.length - 1){
+        recorder.stop();
+      }
 
     }
 

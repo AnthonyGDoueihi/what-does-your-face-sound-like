@@ -72,7 +72,7 @@ function draw(){
     textSize(20);
 
     if (canSeeFace){
-
+//TODO put something here that shows how big the face should be when not visible
     }else{
 
     }
@@ -267,9 +267,17 @@ function draw(){
         break;
 
       case 12:
-      //TODO dont know tf to do here
-        text('12', width - 50, 50);
-        text("THE END")
+        flowersOfLife();
+
+        textAlign(CENTER, BOTTOM);
+
+        const tiwyfsl = 'This is What Your Face Sounds Like';
+        fill(0);
+        text(tiwyfsl, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
+        fill(88,124,107);
+        text(tiwyfsl, sideWidth5, height - height8/2, width - sideWidth5);
+
+        noLoop();
         break;
 
       default:
@@ -667,4 +675,3 @@ function flowersOfLife(){
 	c += 2;
 	angle += 0.5;
 }
- 

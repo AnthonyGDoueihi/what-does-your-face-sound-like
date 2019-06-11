@@ -1,7 +1,9 @@
 audio{
-  display: block;
-  margin: 0 auto;
-  line-height: 100vh;
+  display: inline-block;
+  position: absolute;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
 }
 
 .hidden{
