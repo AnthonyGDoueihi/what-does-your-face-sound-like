@@ -67,15 +67,22 @@ let rightEyeStore = "";
 let lastDirection = "";
 let currentChord = "";
 
+//WEB AUDIO Recorder for saving the music
+const actx = Tone.context;
+const dest = actx.createMediaStreamDestination();
+const recorder = new MediaRecorder(dest.stream);
+const chunks = [];
+const audio = document.querySelector('audio');
+
 const setupAudio = function(){
   // Setup drum samples
-  clap = new Tone.Player('./assets/CLAP.mp3').toMaster();
-  kick = new Tone.Player('./assets/KICK.mp3').toMaster();
-  rimshot = new Tone.Player('./assets/RIMSHOT.mp3').toMaster();
-  snare = new Tone.Player('./assets/SNARE.mp3').toMaster();
+  clap = new Tone.Player('./assets/CLAP.mp3').connect(dest).toMaster();
+  kick = new Tone.Player('./assets/KICK.mp3').connect(dest).toMaster();
+  rimshot = new Tone.Player('./assets/RIMSHOT.mp3').connect(dest).toMaster();
+  snare = new Tone.Player('./assets/SNARE.mp3').connect(dest).toMaster();
 
   // Melody Synth to play only one or two notes at a time
-  melody = new Tone.PolySynth(2, Tone.Synth).toMaster();
+  melody = new Tone.PolySynth(2, Tone.Synth).connect(dest).toMaster();
 
   // Chord Synth to play 3 notes at a time
   chord = new Tone.PolySynth(3, Tone.Synth, {
@@ -85,7 +92,7 @@ const setupAudio = function(){
         sustain  : 0,
         release  : 0.4
     }
-  }).toMaster();
+  }).connect(dest).toMaster();
 
   // The loop
   sequence = new Tone.Sequence( (time, col) => {
@@ -94,19 +101,25 @@ const setupAudio = function(){
       // Increment time in loop
       timelineCount += 1;
 
-      // If on final loop end
-      if( timelineCount === 12 ){
-        chord.releaseAll();
-        sequence.stop();
-        Tone.Transport.toggle();
-      }
-
       if ( timelineCount === 8 ){
         chord.releaseAll();
       }
 
       if ( timelineCount === 9 ){
         startMelody();
+      }
+
+      // If on final loop end
+      if( timelineCount === 11 ){
+        recorder.start();
+      }
+
+      // If on final loop end
+      if( timelineCount === 12 ){
+        chord.releaseAll();
+        sequence.stop();
+        recorder.stop();
+        Tone.Transport.toggle();
       }
 
       if ( [4, 6, 8, 10].includes(timelineCount) ){
@@ -254,4 +267,11 @@ const playMelody = function(col){
 const playButton = function(){
   sequence.start();
   Tone.Transport.toggle();
+}
+
+recorder.ondataavailable = evt => chunks.push(evt.data);
+recorder.onstop = evt => {
+  let blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
+  audio.src = URL.createObjectURL(blob);
+  audio.className = "";
 }

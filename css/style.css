@@ -1,0 +1,9 @@
+audio{
+  display: block;
+  margin: 0 auto;
+  line-height: 100vh;
+}
+
+.hidden{
+  display: none;
+}
