@@ -71,7 +71,6 @@ function draw(){
     fill(200);
     textSize(20);
 
-
     if (canSeeFace){
 
     }else{
@@ -137,6 +136,8 @@ function draw(){
 
       case 3:
         // Which Key
+        keySelection();
+
         textAlign(CENTER, BOTTOM);
         const wk = 'Which Key? Use Your Nose';
         fill(0);
@@ -144,13 +145,14 @@ function draw(){
         fill(88,124,107);
         text(wk, sideWidth5, height - height8/2, width - sideWidth5);
 
-        keySelection();
 
         break;
 
       case 4:
         //How to do the hats
         textAlign(CENTER, BOTTOM);
+
+        countdownTimer();
 
         const tyh = 'Tilt Your Head.';
         fill(0);
@@ -164,7 +166,6 @@ function draw(){
         fill(88,124,107);
         text(tptd, sideWidth5, height - height8/2, width - sideWidth5);
 
-        countdownTimer();
 
         break;
 
@@ -184,6 +185,7 @@ function draw(){
       case 6:
         //Well done & How to do the chords
         textAlign(CENTER, BOTTOM);
+        countdownTimer();
 
         const syhsts = 'Shake Your Head Side to Side.';
         fill(0);
@@ -197,7 +199,6 @@ function draw(){
         fill(88,124,107);
         text(tctc, sideWidth5, height - height8/2, width - sideWidth5);
 
-        countdownTimer();
 
         break;
 
@@ -217,8 +218,9 @@ function draw(){
       case 8:
         // Well done & How to do the melody
         textAlign(CENTER, BOTTOM);
+        countdownTimer();
 
-        const myhats = 'Move Your Head Around the Screen.';
+        const myhats = 'Move Your Head Around the Screen';
         fill(0);
         text(myhats, sideWidth5 + 4, height - 3 * height8/2 + 4, width - sideWidth5 + 4);
         fill(88,124,107);
@@ -230,7 +232,6 @@ function draw(){
         fill(88,124,107);
         text(tptm, sideWidth5, height - height8/2, width - sideWidth5);
 
-        countdownTimer();
 
         break;
 
@@ -249,6 +250,8 @@ function draw(){
 
       case 10:
         // Congradulations!!!!
+        countdownTimer();
+
         textAlign(CENTER, BOTTOM);
 
         const rftfs = 'Ready for the Final Song?';
@@ -257,12 +260,10 @@ function draw(){
         fill(88,124,107);
         text(rftfs, sideWidth5, height - height8/2, width - sideWidth5);
 
-        countdownTimer();
         break;
 
       case 11:
-      //TODO dont know tf to do here
-      //Record camera maybe?
+        flowersOfLife();
         break;
 
       case 12:
@@ -383,16 +384,16 @@ function drawChords(){
     averageJawX = inversePoints(getValues.averagePoints(jaw)).x;
 
     stroke(0, 0, 255);
-    line(averageJawX, shiftDown, averageJawX, height - shiftDown);
+    // line(averageJawX, shiftDown, averageJawX, height - shiftDown);
 
     nosePointKey = inversePoints(getValues.nosePointer());
 
     if( nosePointKey.x < averageJawX ){
-      fill(255, 0, 0, 0.5);
+      fill(255, 0, 0, 155);
       rect(sideWidth, shiftDown, averageJawX - sideWidth, height - (2 * shiftDown));
     }else{
-      fill(255, 0, 0, 0.5);
-      rect(averageJawX, shiftDown, width - averageJawX + sideWidth, height - (2 * shiftDown));
+      fill(255, 0, 0, 155);
+      rect(averageJawX, shiftDown, width - averageJawX - sideWidth, height - (2 * shiftDown));
     }
 
     fill(255, 255, 255);
@@ -442,9 +443,7 @@ function drawSmile(){
 
 function angleBetweenVectors(x1, y1, x2, y2){
   const dot = x1 * x2 + y1 * y2;
-  // console.log('d', dot);
   const lengths = hypot({ x:0, y:0 },{ x:x1, y:y1 } ) * hypot({ x:0, y:0 },{ x:x2, y:y2 } );
-  // console.log('l', lengths);
 
   return acos(dot/lengths);
 }
@@ -488,7 +487,7 @@ function drawHeadTiltMeasures(){
 }
 
 function keySelection(){
-
+  push();
   // To Point with the Nose
   if(facePoints){
     nosePointKey = inversePoints(getValues.nosePointer());
@@ -590,6 +589,7 @@ function keySelection(){
 
 
   circle(nosePointKey.x, nosePointKey.y, 20);
+  pop();
 }
 
 function mousePressed() {
@@ -613,16 +613,57 @@ function inversePoints(point){
 let timeLeft;
 
 function newTimer(){
-  timeLeft = 4;
+  timeLeft = 32;
   startFrame = frameCount;
 }
 
-function countdownTimer(){
-  if ( (frameCount - startFrame) % 20 === 0 && timeLeft > 0 ){
-    timeLeft --;
-  }
+function timerTick(){
+  timeLeft --;
+}
 
+function countdownTimer(){
+  push();
+  stroke(0);
+  fill(100, 0, 0, 100);
+  circle(width/2, height/2, height - 2 * shiftDown);
+  fill(0, 0, 100, 100);
+  arc(width/2, height/2, height - 2 * shiftDown, height - 2 * shiftDown, -90, -90 + (45 * (timeLeft % 8)));
+
+  fill(255);
   textAlign(CENTER, CENTER);
   textSize(100);
-  text(timeLeft, width/2, height/2);
+  text(Math.floor(timeLeft/8), width/2, height/2);
+  pop();
+}
+
+let c = 0
+let angle = 0;
+function flowersOfLife(){
+  colorMode(HSB, 255);
+
+	translate(width/2, height/2);
+	fill(c, 90, 90, 20);
+	ellipse(0, 0, 200);
+
+	if(c>255){
+		c = 0;
+	}
+
+	rotate(angle);
+
+	for(var i=0; i<12; i++){
+
+		push();
+		ellipse(cos(30*i)*100, sin(30*i)*100, height - 2*shiftDown);
+		pop();
+
+		push();
+		fill(255-c, 120, 150, 20);
+		ellipse(sin(30*i)*100, cos(30*i)*100, (height - 2*shiftDown)/2);
+		pop();
+
+	}
+
+	c += 2;
+	angle += 0.5;
 }

@@ -6,8 +6,8 @@ const music = {
   drum: {
     kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
     clap: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    openHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    closedHat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    rimshot: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    snare: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   },
 
   melodyLeft: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
@@ -54,8 +54,8 @@ let sequence;
 // Noise makers varaibles
 let clap;
 let kick;
-let openHat;
-let closedHat;
+let rimshot;
+let snare;
 let melody;
 let chord;
 
@@ -71,10 +71,8 @@ const setupAudio = function(){
   // Setup drum samples
   clap = new Tone.Player('./assets/CLAP.mp3').toMaster();
   kick = new Tone.Player('./assets/KICK.mp3').toMaster();
-  // openHat = new Tone.Player('./assets/OPENHIHAT.mp3').toMaster();
-  openHat = new Tone.Player('./assets/RIMSHOT.mp3').toMaster();
-  // closedHat = new Tone.Player('./assets/CLOSEDHAT.mp3').toMaster();
-  closedHat = new Tone.Player('./assets/SNARE.mp3').toMaster();
+  rimshot = new Tone.Player('./assets/RIMSHOT.mp3').toMaster();
+  snare = new Tone.Player('./assets/SNARE.mp3').toMaster();
 
   // Melody Synth to play only one or two notes at a time
   melody = new Tone.PolySynth(2, Tone.Synth).toMaster();
@@ -117,6 +115,10 @@ const setupAudio = function(){
 
     }
 
+    if ( [4, 6, 8, 10].includes(timelineCount) ){
+      timerTick();
+    }
+
     // The constant beat through it all
     if ( music.drum.kick[col] === 1 ){
       kick.start(time);
@@ -143,9 +145,9 @@ const setupAudio = function(){
       const headTilt = getValues.headTilt();
       //TODO Throttle this
       if( headTilt === 'left' ){
-        music.drum.openHat[col] = 1;
+        music.drum.rimshot[col] = 1;
       }else if ( headTilt === 'right' ){
-        music.drum.closedHat[col] = 1;
+        music.drum.snare[col] = 1;
       }
 
       playDrum(col);
@@ -211,12 +213,12 @@ const setupAudio = function(){
 }
 
 const playDrum = function(col){
-  if ( music.drum.openHat[col] === 1 ){
-    openHat.start();
+  if ( music.drum.rimshot[col] === 1 ){
+    rimshot.start();
   }
 
-  if ( music.drum.closedHat[col] === 1 ){
-    closedHat.start();
+  if ( music.drum.snare[col] === 1 ){
+    snare.start();
   }
 
 }
