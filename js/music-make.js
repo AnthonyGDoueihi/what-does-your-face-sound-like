@@ -108,14 +108,16 @@ const setupAudio = function(){
     }
 
     // Get the notes that the melody and chords can play
-    if ( timelineCount === 4 ){
+    if ( timelineCount === 4 && !noteArray ){
       if (key === null){
         const randNotes = "ABCDEFG".split("");
         key = randNotes[Math.floor( Math.random() * randNotes.length)];
       }
 
-      noteArray = Tonal.scale(musicScale).map(Tonal.transpose( key + "3")).concat(Tonal.scale(musicScale).map(Tonal.transpose( key + "4")));
-      chordNoteArray = Tonal.scale(musicScale).map(Tonal.transpose( key + "4"));
+      noteArray = Tonal.scale(musicScale).map(Tonal.transpose( key + "4")).concat(Tonal.scale(musicScale).map(Tonal.transpose( key + "5")));
+
+      chordNoteArray = Tonal.scale(musicScale).map(Tonal.transpose( key + "3"));
+
     }
 
     // Record the highhat and play it

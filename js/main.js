@@ -72,7 +72,7 @@ function draw(){
 
 
     if (canSeeFace){
-      drawEyebrows();
+
     }else{
 
     }
@@ -144,7 +144,7 @@ function draw(){
         text('5', width - 50, 50);
         text("Recording Hats", 50, 50);
 
-        drawEyebrows();
+        drawHeadTiltMeasures();
         break;
 
       case 6:
@@ -202,9 +202,8 @@ function draw(){
 
 let particles = [];
 
-// function circle
-
 function drawMelody(){
+  // TODO change this so it works better in tune with the music-make
   colorMode(HSL, 360);
   const leftEyePos = inversePoints(getValues.averagePoints(getFacePiece.getLeftEye()));
   const rightEyePos = inversePoints(getValues.averagePoints(getFacePiece.getRightEye()));
@@ -337,45 +336,39 @@ function angleBetweenVectors(x1, y1, x2, y2){
   return acos(dot/lengths);
 }
 
-function drawEyebrows(){
-  const leftBrow = getFacePiece.getLeftEyeBrow();
+function drawHeadTiltMeasures(){
+  colorMode(RGB, 255);
+  const leftAverage = inversePoints(getValues.averagePoints(getFacePiece.getLeftEyeBrow()));
+  const rightAverage = inversePoints(getValues.averagePoints(getFacePiece.getRightEyeBrow()));
+  textAlign(CENTER, CENTER);
+  //left and right are swapped due to camera flip
+  if( getValues.headTilt() === 'left' ){
+    fill(255, 255, 0, 200);
+    circle(leftAverage.x, leftAverage.y, 100);
 
-  beginShape();
+    fill(255, 255, 0, 100);
+    circle(rightAverage.x, rightAverage.y, 100);
 
-  let convertedPoint = inversePoints(leftBrow[leftBrow.length - 1]);
-  curveVertex(convertedPoint.x, convertedPoint.y);
+    fill(10);
+    text('right', leftAverage.x, leftAverage.y);
 
-  for ( let i = 0; i < leftBrow.length; i ++){
-    const convertedPoint = inversePoints(leftBrow[i]);
-    curveVertex(convertedPoint.x, convertedPoint.y);
+  }else if ( getValues.headTilt() === 'right' ){
+    fill(255, 255, 0, 100);
+    circle(leftAverage.x, leftAverage.y, 100);
+
+    fill(255, 255, 0, 200);
+    circle(rightAverage.x, rightAverage.y, 100);
+
+    fill(10);
+    text('left', rightAverage.x, rightAverage.y);
+  }else{
+    fill(255, 255, 0, 100);
+    circle(leftAverage.x, leftAverage.y, 100);
+
+    fill(255, 255, 0, 100);
+    circle(rightAverage.x, rightAverage.y, 100);
   }
 
-  convertedPoint = inversePoints(leftBrow[0]);
-  curveVertex(convertedPoint.x, convertedPoint.y);
-  convertedPoint = inversePoints(leftBrow[1]);
-  curveVertex(convertedPoint.x, convertedPoint.y);
-
-  endShape();
-
-  const rightBrow = getFacePiece.getRightEyeBrow();
-
-
-  beginShape();
-
-  let convertedPoint = inversePoints(rightBrow[rightBrow.length - 1]);
-  curveVertex(convertedPoint.x, convertedPoint.y);
-
-  for ( let i = 0; i < rightBrow.length; i ++){
-    const convertedPoint = inversePoints(rightBrow[i]);
-    curveVertex(convertedPoint.x, convertedPoint.y);
-  }
-
-  convertedPoint = inversePoints(rightBrow[0]);
-  curveVertex(convertedPoint.x, convertedPoint.y);
-  convertedPoint = inversePoints(rightBrow[1]);
-  curveVertex(convertedPoint.x, convertedPoint.y);
-
-  endShape();
 }
 
 function keySelection(){
