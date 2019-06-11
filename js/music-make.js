@@ -77,12 +77,17 @@ const audio = document.querySelector('audio');
 const setupAudio = function(){
   // Setup drum samples
   clap = new Tone.Player('./assets/CLAP.mp3').connect(dest).toMaster();
+  clap.volume.value = -6;
   kick = new Tone.Player('./assets/KICK.mp3').connect(dest).toMaster();
+  kick.volume.value = -6;
   rimshot = new Tone.Player('./assets/RIMSHOT.mp3').connect(dest).toMaster();
+  rimshot.volume.value = -6;
   snare = new Tone.Player('./assets/SNARE.mp3').connect(dest).toMaster();
+  snare.volume.value = -6;
 
   // Melody Synth to play only one or two notes at a time
   melody = new Tone.PolySynth(2, Tone.Synth).connect(dest).toMaster();
+  melody.volume.value = -6;
 
   // Chord Synth to play 3 notes at a time
   chord = new Tone.PolySynth(3, Tone.Synth, {
@@ -93,6 +98,7 @@ const setupAudio = function(){
         release  : 0.4
     }
   }).connect(dest).toMaster();
+  chord.volume.value = -6;
 
   // The loop
   sequence = new Tone.Sequence( (time, col) => {
@@ -269,8 +275,8 @@ const playButton = function(){
   Tone.Transport.toggle();
 }
 
-recorder.ondataavailable = evt => chunks.push(evt.data);
-recorder.onstop = evt => {
+recorder.ondataavailable = event => chunks.push(event.data);
+recorder.onstop = event => {
   let blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
   audio.src = URL.createObjectURL(blob);
   audio.className = "";
