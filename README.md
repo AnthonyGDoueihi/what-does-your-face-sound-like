@@ -7,7 +7,7 @@
 
 "What Does Your Face Sound Like?" is a project completed as apart of General Assembly's Software Engineering Immersive Course.
 
-"What Does Your Face Sound Like?" was created as an experiment, users can use this to create music using Synthesisers and Drum Samples, using only their face movements. Requires the device to have a webcam.
+Users can use this project to create music using Synthesisers and Drum Samples, with only the movements of their face and head. 
 
 ### Built With
 * [face-api.js](https://github.com/justadudewhohacks/face-api.js)
@@ -17,6 +17,6 @@
 
 
 <!-- GETTING STARTED -->
-### Local
+### Running Locally
 
-There is no required external install, but a local server is required to access the webcam.
+There is no required external install, but a local server is needed to access the webcam.
