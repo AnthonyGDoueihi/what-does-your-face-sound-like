@@ -87,7 +87,7 @@ function draw(){
       //Before the original play
         // Title
         textAlign(LEFT, BOTTOM);
-        const heading = 'What Sound Does Your Face Make?';
+        const heading = 'What Does Your Face Sound Like?';
         fill(0);
         text(heading, sideWidth5 + 4, height - height8/2 + 4, width - sideWidth5 + 4);
         fill(88,124,107);
