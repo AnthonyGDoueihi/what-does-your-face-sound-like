@@ -398,11 +398,12 @@ function drawMelody(){
 }
 
 // Gets the middle of your face according to the jaw and checks which side the nose is to colour it
+let averageJawX;
 function drawChords(){
   if(facePoints){
 
     const jaw = getFacePiece.getJawOutline();
-    const averageJawX = inversePoints(getValues.averagePoints(jaw)).x;
+    averageJawX = inversePoints(getValues.averagePoints(jaw)).x;
 
     stroke(0, 0, 255);
 
