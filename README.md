@@ -20,3 +20,5 @@ Users can use this project to create music using Synthesisers and Drum Samples, 
 ### Running Locally
 
 There is no required external install, but a local server is needed to access the webcam.
+
+AND THANK YOUS TO JOEL AND YIANNI
